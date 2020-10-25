@@ -17,31 +17,40 @@ namespace Interpreter
             while (true)
             {
                 //Input
-                Console.WriteLine("Try the interpreter by typing in a number ");
-                char[] input = new char[MAX_CHAR];
-                Console.In.Read(input);
-
+                Console.WriteLine("Try the interpreter by typing in basic arithmatic ");
+                char[] inputRaw = new char[MAX_CHAR];
+                Console.In.Read(inputRaw);
+                
                 //Testing input
-                Console.WriteLine("Input was {0}", new string(input));
+                //Console.WriteLine("Input was {0}", new string(inputRaw));
                 //Test over for input
 
                 //LEXER
-                Lexer lex = new Lexer(ref input,ref MAX_TOKENS, ref lt);
+                Lexer lex = new Lexer(ref inputRaw, ref MAX_TOKENS, ref lt);
                 Console.WriteLine("Lexer started");
                 if (((NO_tokens = lex.Process())) > 1)
                     Console.WriteLine("{0} tokens found!", NO_tokens);
                 else
                     Console.WriteLine("No tokens were found?!");
-                
-                for (int i=0; i < NO_tokens; i++)
+
+                for (int i = 0; i < NO_tokens; i++)
                 {
                     Console.WriteLine("Token {0} = ID,Value {1} -> {2}", i, lt.tokens[i], lt.symbols[i]);
                 }
 
-            
-                
-                
-                Console.WriteLine("");
+                //Parser
+                Console.WriteLine("Parser started");
+                Parser parser = new Parser(lt);
+                parser.Parse();
+
+                //Executor
+                Console.WriteLine("Executor started");
+                Executor executor = new Executor(lt);
+                double result = executor.ShuntYard();
+
+                Console.WriteLine("answer is -> {0} \n", result);
+
+
             }
 
         }

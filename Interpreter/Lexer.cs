@@ -1,20 +1,12 @@
 ﻿using System;
 using System.Text;
+using static LookupTable;
 
 public class Lexer
 {
 	char[] input; //Input parsed through reference
 	LookupTable lt; //Lookup Table parsed thorugh reference
 	int MAX_TOKENS;
-
-	//TOKEN KEY
-	static int T_PLUS = 1;
-	static int T_MINUS = 2;
-	static int T_MULTIPLY = 3;
-	static int T_DIVIDE = 4;
-	static int T_LPAR = 5;
-	static int T_RPAR = 6;
-	static int T_NR = 7;
 
 	public Lexer(ref char[] input, ref int MAX_TOKENS, ref LookupTable lt)
 	{
@@ -26,7 +18,6 @@ public class Lexer
 	public int Process()
 	{
 		int token_i = 0; //Token Counter
-		
 		for (int i = 0; input[i]!='\n'; ++i) //For loop to go through input
 		{
 			if (token_i == MAX_TOKENS) //If token count is the same size as max tokens stop the lexer 
@@ -38,37 +29,43 @@ public class Lexer
 
 				case ('+'): //Used to add the plus to the token array
 					{
-					lt.tokens[token_i++] = T_PLUS;
+					lt.tokens[token_i++] = Tokens.Plus;
 					break;
 					}
 
 				case ('-'): //Used to add the minus to the token array
 					{
-						lt.tokens[token_i++] = T_MINUS;
+						lt.tokens[token_i++] = Tokens.Minus;
+						break;
+					}
+
+				case ('^'): //Used to add the multiplication to the token array
+					{
+						lt.tokens[token_i++] = Tokens.Exponent;
 						break;
 					}
 
 				case ('*'): //Used to add the multiplication to the token array
 					{
-						lt.tokens[token_i++] = T_MULTIPLY;
+						lt.tokens[token_i++] = Tokens.Multiply;
 						break;
 					}
 
 				case ('/'): //Used to add the division to the token array
 					{
-						lt.tokens[token_i++] = T_DIVIDE;
+						lt.tokens[token_i++] = Tokens.Divide;
 						break;
 					}
 				
 				case ('('): //Used to add the left bracket to the token array
 					{
-						lt.tokens[token_i++] = T_LPAR;
+						lt.tokens[token_i++] = Tokens.Left_Para;
 						break;
 					}
 				
 				case (')'): //Used to add the right bracket to the token array
 					{
-						lt.tokens[token_i++] = T_RPAR;
+						lt.tokens[token_i++] = Tokens.Right_Para;
 						break;
 					}
 
@@ -87,22 +84,6 @@ public class Lexer
 							 * number in the symbol table
 							 */
 
-							int number_counter = 0;
-							char[] number = new char[input.Length];
-							if(input[i+1] == '=')
-							{
-								i += 2 ;
-								while (Char.IsDigit(input[i]))
-								{
-									number[number_counter++] = input[i];
-									++i;
-								}
-								ASCIIEncoding ascii = new ASCIIEncoding();
-
-								lt.tokens[token_i] = (byte)input[i-2];
-								lt.symbols[token_i++] = int.Parse(new string(number));
-								--i;
-							}
 							break;
 						}
 						else
@@ -120,7 +101,7 @@ public class Lexer
 								number[number_counter++] = input[i];
 								++i;
 							}
-							lt.tokens[token_i] = T_NR;
+							lt.tokens[token_i] = Tokens.Number;
 							lt.symbols[token_i++] = int.Parse(new string(number));
 							--i;
 							break;
@@ -130,6 +111,13 @@ public class Lexer
 			}
 
 		}
+		int fill_array=token_i;
+		while (fill_array < lt.tokens.Length)
+		{
+			lt.tokens[fill_array++] = Tokens.EMPTY;
+		}
+
+
 		return token_i;
 	}
 
