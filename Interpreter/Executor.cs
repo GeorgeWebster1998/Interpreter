@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using static LookupTable;
 using static LookupTable.Tokens;
 public class Executor
 {
@@ -9,7 +10,7 @@ public class Executor
 	double operand1, operand2;
 	LookupTable.Tokens operatorID;
 
-	public Executor(LookupTable lt)
+	public Executor(ref LookupTable lt)
 	{
 		this.lt = lt;
 		Operators = new Stack();
@@ -42,7 +43,7 @@ public class Executor
 				break;
 
 			case LookupTable.Tokens.Divide:
-				Numbers.Push(operand1 - operand2);
+				Numbers.Push(operand1 / operand2);
 				break;
 		}
 	}
@@ -51,12 +52,21 @@ public class Executor
 	{
 		int count = 0;
 
-		while (count < lt.tokens.Length)
+		while (count < lt.symbols.Length)
 		{
-			switch (lt.tokens[count])
+			switch (lt.symbols[count].type)
 			{
-				case Number:
-					Numbers.Push(lt.symbols[count++]);
+				case Integer:
+					Numbers.Push(lt.symbols[count++].value);
+					break;
+
+				case Float:
+					Numbers.Push(lt.symbols[count++].value);
+					break;
+
+				case Equal:
+
+					count++;
 					break;
 
 				case Plus:
@@ -64,7 +74,7 @@ public class Executor
 					{
 						Calculate();
 					}
-					Operators.Push(lt.tokens[count++]);
+					Operators.Push(lt.symbols[count++].type);
 					break;
 
 				case Minus:
@@ -72,7 +82,7 @@ public class Executor
 					{
 						Calculate();
 					}
-					Operators.Push(lt.tokens[count++]);
+					Operators.Push(lt.symbols[count++].type);
 					break;
 
 				case Exponent:
@@ -80,7 +90,7 @@ public class Executor
 					{
 						Calculate();
 					}
-					Operators.Push(lt.tokens[count++]);
+					Operators.Push(lt.symbols[count++].type);
 					break;
 
 
@@ -90,7 +100,7 @@ public class Executor
 					{
 						Calculate();
 					}
-					Operators.Push(lt.tokens[count++]);
+					Operators.Push(lt.symbols[count++].type);
 					break;
 
 				case Divide:
@@ -99,11 +109,11 @@ public class Executor
 					{
 						Calculate();
 					}
-					Operators.Push(lt.tokens[count++]);
+					Operators.Push(lt.symbols[count++].type);
 					break;
 
 				case Left_Para:
-					Operators.Push(lt.tokens[count++]);
+					Operators.Push(lt.symbols[count++].type);
 					break;
 
 				case Right_Para:
@@ -127,7 +137,7 @@ public class Executor
 		{
 			Calculate();
 		}
-		return (double)Numbers.Pop();
+		return Convert.ToDouble(Numbers.Pop());
 	}
 	
 

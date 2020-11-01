@@ -16,26 +16,45 @@ public class LookupTable
 		Multiply = 2,
 		Divide = 3,
 		Exponent = 4,
+		Equal = 5,
 		Left_Para = 7,
 		Right_Para = 8,
-		Number = 9,
-		Varaible = 10
+		Integer = 9,
+		Float = 10,
+		Varaible = 11
 	}
 	//DICTIONARY
 
-	public Tokens[] tokens; 
-	public int[] symbols;
-	
+	public Symbol[] symbols;
+
 	public LookupTable(int MAX_TOKENS)
 	{
-		tokens = new Tokens[MAX_TOKENS];
-		symbols = new int[MAX_TOKENS];
-
-		for (int i = 0; i < MAX_TOKENS; i++)
-		{
-			symbols[i] = -1; //This is kept at -1 for symbols and used when storing numbers.
-		}
+		symbols = new Symbol[MAX_TOKENS]; //remake to support variable pointers!
 	}
 
+	public struct Symbol
+	{
+		public Symbol(Tokens type, Object value)
+		{
+			this.type = type;
+			this.value = value;
+		}
 
+		public Tokens type { get; }
+		public Object value { get; }
+		public struct Var
+		{
+			public Var(string name, bool isPtr, Object value)
+			{
+				this.name = name;
+				this.isPtr = isPtr;
+				this.value = value;
+			}
+			public string name { get; }
+			public bool isPtr { get; set; }
+			public Object value { get; set; }
+
+			public override string ToString() { return name +" "+ value; }
+		}
+	}
 }

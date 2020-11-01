@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Text;
 using static LookupTable;
+using static LookupTable.Symbol;
+using static LookupTable.Tokens;
 
 public class Lexer
 {
@@ -27,45 +28,51 @@ public class Lexer
 			{
 				case (' '): break; //Used to ignore spaces from the input
 
+				case ('='): //Used to assign variable
+					{
+						lt.symbols[token_i++] = new Symbol(Equal, 0);
+						break;
+					}
+
 				case ('+'): //Used to add the plus to the token array
 					{
-					lt.tokens[token_i++] = Tokens.Plus;
-					break;
+						lt.symbols[token_i++] = new Symbol(Plus, 0);
+						break;
 					}
 
 				case ('-'): //Used to add the minus to the token array
 					{
-						lt.tokens[token_i++] = Tokens.Minus;
+						lt.symbols[token_i++] = new Symbol(Minus, 0);
 						break;
 					}
 
 				case ('^'): //Used to add the multiplication to the token array
 					{
-						lt.tokens[token_i++] = Tokens.Exponent;
+						lt.symbols[token_i++] = new Symbol(Exponent, 0);
 						break;
 					}
 
 				case ('*'): //Used to add the multiplication to the token array
 					{
-						lt.tokens[token_i++] = Tokens.Multiply;
+						lt.symbols[token_i++] = new Symbol(Multiply, 0);
 						break;
 					}
 
 				case ('/'): //Used to add the division to the token array
 					{
-						lt.tokens[token_i++] = Tokens.Divide;
+						lt.symbols[token_i++] = new Symbol(Divide, 0);
 						break;
 					}
 				
 				case ('('): //Used to add the left bracket to the token array
 					{
-						lt.tokens[token_i++] = Tokens.Left_Para;
+						lt.symbols[token_i++] = new Symbol(Left_Para, 0);
 						break;
 					}
 				
 				case (')'): //Used to add the right bracket to the token array
 					{
-						lt.tokens[token_i++] = Tokens.Right_Para;
+						lt.symbols[token_i++] = new Symbol(Right_Para, 0);
 						break;
 					}
 
@@ -83,7 +90,14 @@ public class Lexer
 							 * then converting the char to a byte for storage as a token and storing the 
 							 * number in the symbol table
 							 */
-
+							string varName = "";
+							while (Char.IsLetter(input[i]))
+							{
+								varName += input[i];
+								++i;
+							}
+							lt.symbols[token_i++] = new Symbol(Tokens.Varaible, new Symbol.Var(varName, false, 0));
+							--i;
 							break;
 						}
 						else
@@ -96,13 +110,23 @@ public class Lexer
 							 
 							int number_counter = 0;
 							char[] number = new char[input.Length];
-							while (Char.IsDigit(input[i]))
+							bool isFloat = false;
+							while (Char.IsDigit(input[i]) || (input[i]=='.'))
 							{
+								if (input[i] == '.')
+									isFloat = true;
+
 								number[number_counter++] = input[i];
 								++i;
 							}
-							lt.tokens[token_i] = Tokens.Number;
-							lt.symbols[token_i++] = int.Parse(new string(number));
+							if (isFloat)
+							{
+								lt.symbols[token_i++] = new Symbol(Float, float.Parse(new string(number)));
+							}
+							else
+							{
+								lt.symbols[token_i++] = new Symbol(Integer,int.Parse(new string(number)));
+							}
 							--i;
 							break;
 						}
@@ -112,9 +136,9 @@ public class Lexer
 
 		}
 		int fill_array=token_i;
-		while (fill_array < lt.tokens.Length)
+		while (fill_array < lt.symbols.Length)
 		{
-			lt.tokens[fill_array++] = Tokens.EMPTY;
+			lt.symbols[fill_array++] = new Symbol(Tokens.EMPTY, 0);
 		}
 
 

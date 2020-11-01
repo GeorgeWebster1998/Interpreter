@@ -13,14 +13,14 @@ namespace Interpreter
             int MAX_CHAR = 16; //Maximum characters taken from input
             LookupTable lt = new LookupTable(MAX_TOKENS); // Class to store Tokens and Symbols
             int NO_tokens; //Number of tokens
-            
+
             while (true)
             {
                 //Input
                 Console.WriteLine("Try the interpreter by typing in basic arithmatic ");
                 char[] inputRaw = new char[MAX_CHAR];
                 Console.In.Read(inputRaw);
-                
+
                 //Testing input
                 //Console.WriteLine("Input was {0}", new string(inputRaw));
                 //Test over for input
@@ -28,30 +28,30 @@ namespace Interpreter
                 //LEXER
                 Lexer lex = new Lexer(ref inputRaw, ref MAX_TOKENS, ref lt);
                 Console.WriteLine("Lexer started");
-                if (((NO_tokens = lex.Process())) > 1)
+                if (((NO_tokens = lex.Process())) > 1) {
                     Console.WriteLine("{0} tokens found!", NO_tokens);
-                else
+
+                    for (int i = 0; i < NO_tokens; i++)
+                    {
+                        Console.WriteLine("Token {0} = ID,Value {1} -> {2}", i, lt.symbols[i].type, lt.symbols[i].value);
+                    }
+
+                    //Parser
+                    Console.WriteLine("Parser started");
+                    Parser parser = new Parser(ref lt);
+                    parser.Parse();
+
+                    //Executor
+                    Console.WriteLine("Executor started");
+                    Executor executor = new Executor(ref lt);
+                    double result = executor.ShuntYard();
+
+                    Console.WriteLine("answer is -> {0} \n", result);
+                
+                }else
                     Console.WriteLine("No tokens were found?!");
 
-                for (int i = 0; i < NO_tokens; i++)
-                {
-                    Console.WriteLine("Token {0} = ID,Value {1} -> {2}", i, lt.tokens[i], lt.symbols[i]);
-                }
-
-                //Parser
-                Console.WriteLine("Parser started");
-                Parser parser = new Parser(lt);
-                parser.Parse();
-
-                //Executor
-                Console.WriteLine("Executor started");
-                Executor executor = new Executor(lt);
-                double result = executor.ShuntYard();
-
-                Console.WriteLine("answer is -> {0} \n", result);
-
-
-            }
+        }
 
         }
     }
