@@ -9,8 +9,8 @@ namespace Interpreter
     {
         static void Main()
         {
-            int MAX_TOKENS = 16; //Maximum number of tokens the lexer will define
-            int MAX_CHAR = 16; //Maximum characters taken from input
+            int MAX_TOKENS = 32; //Maximum number of tokens the lexer will define
+            int MAX_CHAR = 32; //Maximum characters taken from input
             LookupTable lt = new LookupTable(MAX_TOKENS); // Class to store Tokens and Symbols
             int NO_tokens; //Number of tokens
 
@@ -31,22 +31,24 @@ namespace Interpreter
                 if (((NO_tokens = lex.Process())) > 1) {
                     Console.WriteLine("{0} tokens found!", NO_tokens);
 
+                   /*
                     for (int i = 0; i < NO_tokens; i++)
                     {
                         Console.WriteLine("Token {0} = ID,Value {1} -> {2}", i, lt.symbols[i].type, lt.symbols[i].value);
                     }
+                   */
 
                     //Parser
                     Console.WriteLine("Parser started");
                     Parser parser = new Parser(ref lt);
-                    parser.Parse();
+                    Console.WriteLine(parser.Parse());
 
                     //Executor
                     Console.WriteLine("Executor started");
-                    Executor executor = new Executor(ref lt);
-                    double result = executor.ShuntYard();
+                    //Executor executor = new Executor(ref lt);
+                    //double result = executor.ShuntYard();
 
-                    Console.WriteLine("answer is -> {0} \n", result);
+                    //Console.WriteLine("answer is -> {0} \n", result);
                 
                 }else
                     Console.WriteLine("No tokens were found?!");
