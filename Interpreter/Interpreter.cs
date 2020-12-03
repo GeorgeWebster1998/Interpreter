@@ -1,5 +1,7 @@
 ﻿using System;
 using InterpreterCore;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Interpreter
 {
@@ -15,16 +17,16 @@ namespace Interpreter
             while (true)
             {
                 //Input
-                Console.WriteLine("Try the interpreter by typing in basic arithmatic ");
-                char[] inputRaw = new char[MAX_CHAR];
-                Console.In.Read(inputRaw);
+                Console.WriteLine("Try the interpreter");
+                char[] input = new char[MAX_CHAR];
+                Console.In.Read(input);
 
                 //Testing input
                 //Console.WriteLine("Input was {0}", new string(inputRaw));
                 //Test over for input
 
                 //LEXER
-                Lexer lex = new Lexer(ref inputRaw, ref MAX_TOKENS, ref lt);
+                Lexer lex = new Lexer(ref input, ref MAX_TOKENS, ref lt);
                 Console.WriteLine("Lexer started");
                 if (((NO_tokens = lex.Process())) > 1) {
                     Console.WriteLine("{0} tokens found!", NO_tokens);
@@ -34,22 +36,39 @@ namespace Interpreter
                     Console.WriteLine("Parser started");
                     Parser parser = new Parser(ref lt);
                     string parseResult = parser.Parse();
-                    Console.WriteLine(parseResult);
-                    if (parseResult == "Parsed")
+                    if (parseResult == "p")
                     {
                        //Executor
                         //Console.WriteLine("Executor started");
                         Executor executor = new Executor(ref lt);
                         Object result = executor.ShuntYard();
 
-                        lt.resetSymbols(MAX_TOKENS);
+                        if(result is string)
+                        {
+                            var list = lt.variables.ToList();
 
-                        Console.WriteLine("answer is -> {0} \n", result);
+                            foreach (KeyValuePair<string, LookupTable.Var> temp in list)
+                            {
+                                Console.WriteLine("{0} -> {1}", temp.Key, temp.Value.Value);
+                            }
+                            Console.WriteLine();
 
+                        }
+                        else
+                        {
+                            Console.WriteLine("answer is -> {0} \n", result);
+                        }
+
+                        lt.ResetSymbols(MAX_TOKENS);
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Parser failed with error: {0} \n", parseResult);
                     }
                 }
                 else
-                    Console.WriteLine("No tokens were found?!");
+                    Console.WriteLine("No tokens were found?! \n");
 
         }
 

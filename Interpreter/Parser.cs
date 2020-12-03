@@ -7,7 +7,7 @@ public class Parser
 	int currentToken;
 	string ret;
 	LookupTable lt;
-	ParsedTrie ParsedTrie;
+	ParsedTrie trie;
 	ParsedTrie AST;
 
 
@@ -15,9 +15,9 @@ public class Parser
 	{
 		this.LookAhead = -1;
 		this.currentToken = 0;
-		this.ret = "Parsed";
+		this.ret = "p";
 		this.lt = lt;
-		ParsedTrie = new ParsedTrie();
+		trie = new ParsedTrie();
 	}
 
 	/*	BNF
@@ -38,47 +38,61 @@ public class Parser
 		/*Check that lt is parsed correctly 
 		*/
 		Statement(0);
-		//ParsedTrie.PrintWidthFirst();
+		trie.PrintDepthFirst();
 		return ret;
 
 	}
 
 	bool Match_Token(int token)
 	{
-		this.LookAhead = (int)lt.symbols[currentToken].type;
+		this.LookAhead = (int)lt.symbols[currentToken].Type;
 		return (LookAhead.Equals(token));
 
 	}
 
 	void Advance_LookAhead()
 	{
-		this.LookAhead = (int)lt.symbols[++currentToken].type;
+		this.LookAhead = (int)lt.symbols[++currentToken].Type;
 	}
 
 	void Statement(int level)
 	{
-		//trie.AddNewNode(level, LookupTable.Tokens.EMPTY, "<<Statement>>");
-		Variable(level + 1, true);
+		bool isStatement = false;
 
-		if (Match_Token((int)LookupTable.Tokens.Equal))
+		if (lt.GetSymbol(1).Type == Tokens.Equal)
 		{
-		//	trie.AddNewNode(level + 1, "<<Statement>>", LookupTable.Tokens.Equal);
-			Advance_LookAhead();
+			trie.AddNewNode(level, Tokens.EMPTY, "<<Statement>>");
+			Variable(level + 1, true);
+			isStatement = true;
+
+			if (Match_Token((int) Tokens.Equal))
+			{
+				trie.AddNewNode(level + 1, "<<Statement>>", Tokens.Equal);
+				Advance_LookAhead();
+			}
+
 		}
 
-		Expression(level + 1);
+		if (isStatement)
+		{
+			Expression(level+1);
+		}
+		else
+		{
+			Expression(level);
+		}
 	}
 
 	void Expression(int level)
 	{
 		//Console.WriteLine("Expression() Called at level {0}", level);
-		if (level == 0)
+		if (level == 1)
 		{
-			ParsedTrie.AddNewNode(level, LookupTable.Tokens.EMPTY, "<<Expression>>");
+			trie.AddNewNode(level, "<<Statement>>", "<<Expression>>");
 		}
 		else
 		{
-			ParsedTrie.AddNewNode(level, "<<Factor>>", "<<Expression>>");
+			trie.AddNewNode(level, "<<Factor>>", "<<Expression>>");
 		}
 		Term(level + 1, true);
 		Expression_Prime(level + 1);
@@ -88,18 +102,18 @@ public class Parser
 	{
 		//Console.WriteLine("Expression_Prime() Called at level {0}", level);
 		
-		if (Match_Token((int)(LookupTable.Tokens.Plus)))
+		if (Match_Token((int)(Tokens.Plus)))
 		{
-			ParsedTrie.AddNewNode(level, "<<Expression>>", "<<Expression_Prime>>");
-			ParsedTrie.AddNewNode(level + 1, "<<Expression_Prime>>", lt.symbols[currentToken]);
+			trie.AddNewNode(level, "<<Expression>>", "<<Expression_Prime>>");
+			trie.AddNewNode(level + 1, "<<Expression_Prime>>", Tokens.Plus);
 			Advance_LookAhead();
 			Term(level + 1, false);
 			Expression_Prime(level + 1);
 		}
-		else if (Match_Token((int)(LookupTable.Tokens.Minus)))
+		else if (Match_Token((int)(Tokens.Minus)))
 		{
-			ParsedTrie.AddNewNode(level, "<<Expression>>", "<<Expression_Prime>>");
-			ParsedTrie.AddNewNode(level + 1, "<<Expression_Prime>>", lt.symbols[currentToken]);
+			trie.AddNewNode(level, "<<Expression>>", "<<Expression_Prime>>");
+			trie.AddNewNode(level + 1, "<<Expression_Prime>>", Tokens.Minus);
 			Advance_LookAhead();
 			Term(level + 1, false);
 			Expression_Prime(level + 1);
@@ -110,11 +124,11 @@ public class Parser
 	{
 		if (isCalledFromExp)
 		{
-			ParsedTrie.AddNewNode(level, "<<Expression>>", "<<Term>>");
+			trie.AddNewNode(level, "<<Expression>>", "<<Term>>");
 		}
 		else
 		{
-			ParsedTrie.AddNewNode(level, "<<Expression_Prime>>", "<<Term>>");
+			trie.AddNewNode(level, "<<Expression_Prime>>", "<<Term>>");
 		}
 		//Console.WriteLine("Term() Called at level {0}", level);
 		Factor(level + 1, true);
@@ -127,24 +141,24 @@ public class Parser
 		//Console.WriteLine("Term_Prime() Called at level {0}", level);
 		if (Match_Token((int)(LookupTable.Tokens.Multiply)))
 		{
-			ParsedTrie.AddNewNode(level, "<<Term>>", "<<Term_Prime>>");
-			ParsedTrie.AddNewNode(level + 1, "<<Term_Prime>>", lt.symbols[currentToken]);
+			trie.AddNewNode(level, "<<Term>>", "<<Term_Prime>>");
+			trie.AddNewNode(level + 1, "<<Term_Prime>>", Tokens.Multiply);
 			Advance_LookAhead();
 			Factor(level + 1, false);
 			Term_Prime(level + 1);
 		}
 		else if (Match_Token((int)(LookupTable.Tokens.Divide)))
 		{
-			ParsedTrie.AddNewNode(level, "<<Term>>", "<<Term_Prime>>");
-			ParsedTrie.AddNewNode(level + 1, "<<Term_Prime>>", lt.symbols[currentToken]);
+			trie.AddNewNode(level, "<<Term>>", "<<Term_Prime>>");
+			trie.AddNewNode(level + 1, "<<Term_Prime>>", Tokens.Divide);
 			Advance_LookAhead();
 			Factor(level + 1, false);
 			Term_Prime(level + 1);
 		}
 		else if (Match_Token((int)(LookupTable.Tokens.Exponent)))
 		{
-			ParsedTrie.AddNewNode(level, "<<Term>>", "<<Term_Prime>>");
-			ParsedTrie.AddNewNode(level + 1, "<<Term_Prime>>", lt.symbols[currentToken]);
+			trie.AddNewNode(level, "<<Term>>", "<<Term_Prime>>");
+			trie.AddNewNode(level + 1, "<<Term_Prime>>", Tokens.Exponent);
 			Advance_LookAhead();
 			Factor(level + 1, false);
 			Term_Prime(level + 1);
@@ -155,22 +169,25 @@ public class Parser
 	{
 		if (isCalledFromTerm)
 		{
-			ParsedTrie.AddNewNode(level, "<<Term>>", "<<Factor>>");
+			trie.AddNewNode(level, "<<Term>>", "<<Factor>>");
 		}
 		else
 		{
-			ParsedTrie.AddNewNode(level, "<<Term_Prime>>", "<<Factor>>");
+			trie.AddNewNode(level, "<<Term_Prime>>", "<<Factor>>");
 		}
 
-		if (Match_Token((int)LookupTable.Tokens.Integer) || (Match_Token((int)LookupTable.Tokens.Float)))
-		{
-			//Console.WriteLine("factor -> {0}", lt.symbols[currentToken].value.ToString());
-			ParsedTrie.AddNewNode(level + 1, "<<Factor>>", lt.symbols[currentToken]);
+		if (Match_Token((int)LookupTable.Tokens.Integer)){
+			trie.AddNewNode(level + 1, "<<Factor>>", lt.GetSymbol(currentToken).Value);
 			Advance_LookAhead();
 		}
-		if (Match_Token((int)LookupTable.Tokens.Variable))
+		else if (Match_Token((int)LookupTable.Tokens.Float))
 		{
-			Variable(level + 1, false);
+			trie.AddNewNode(level + 1, "<<Factor>>", (string)lt.GetSymbol(currentToken).Value);
+			Advance_LookAhead();
+		}
+		else if (Match_Token((int)LookupTable.Tokens.Variable))
+		{
+			Variable(level, false);
 		}
 		else if (Match_Token((int)LookupTable.Tokens.Left_Para))
 		{
@@ -180,9 +197,9 @@ public class Parser
 			{
 				Advance_LookAhead();
 			}
-			else ret = "ERROR: Missing closing bracket";
+			else ret = "Missing closing bracket";
 		}
-		else ret = "ERROR: Missing factor";
+		else ret = "Missing factor";
 	}
 
 	void Variable(int level, bool statement)
@@ -191,19 +208,20 @@ public class Parser
 		{
 			if (statement)
 			{
-				//trie.AddNewNode(level + 1, "<<Statement>>", lt.getSymbol(currentToken).value);
-				lt.addToVariables((string)lt.getSymbol(currentToken).value, new Var(false, 0)); ;
+				trie.AddNewNode(level, "<<Statement>>", (string)lt.GetSymbol(currentToken).Value);
+				lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, new Var(false, (double)0)); ;
 				Advance_LookAhead();
 			}
 			else
 			{
-				if (lt.variableExist((string)lt.getSymbol(currentToken).value))
+				if (lt.VariableExist((string)lt.GetSymbol(currentToken).Value))
 				{
-					//trie.AddNewNode(level + 1, "<<Factor>>", lt.getSymbol(currentToken).value);
+					string varName = (string)lt.GetSymbol(currentToken).Value;
+					trie.AddNewNode(level+1, "<<Factor>>", (string)varName + " -> " + lt.GetVarValue(varName));
 				}
 				else
 				{
-					ret = "ERROR: Variable " + lt.getSymbol(currentToken).value + " not initialised";
+					ret = "Variable " + lt.GetSymbol(currentToken).Value + " not initialised";
 				}
 				Advance_LookAhead();
 			}

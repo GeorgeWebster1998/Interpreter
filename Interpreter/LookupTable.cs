@@ -28,42 +28,42 @@ public class LookupTable
 		symbols = new Symbol[MAX_TOKENS];
 	}
 
-	public void addSymbol(int index, Tokens type, Object value)
+	public void AddSymbol(int index, Tokens type, Object value)
 	{
 		symbols[index] = new Symbol(type, value);
 	}
 
-	public void resetSymbols(int len)
+	public void ResetSymbols(int len)
 	{
 		symbols = new Symbol[len];
 	}
 
-	public Symbol getSymbol(int index)
+	public Symbol GetSymbol(int index)
 	{
 		return symbols[index];
 	}
 
-	public void updateVariable(string key, double value)
+	public void UpdateVariable(string key, double value)
 	{
 		variables[key] = new Var(false, value);
 	}
 
-	public double getVarValue(string key)
+	public double GetVarValue(string key)
 	{
-		return (double)variables[key].value;
+		return (double)variables[key].Value;
 	}
 
-	public void addToVariables(string key, Var value)
+	public void AddToVariables(string key, Var value)
 	{
 		variables.TryAdd(key, value);
 	}
 
-	public void clearVariables()
+	public void ClearVariables()
 	{
 		variables.Clear();
 	}
 
-	public bool variableExist(string key)
+	public bool VariableExist(string key)
 	{
 		return variables.ContainsKey(key);
 	}
@@ -72,24 +72,24 @@ public class LookupTable
 	{
 		public Symbol(Tokens type, Object value)
 		{
-			this.type = type;
-			this.value = value;
+			this.Type = type;
+			this.Value = value;
 		}
 
-		public Tokens type { get; }
-		public Object value { get; }
+		public Tokens Type { get; }
+		public Object Value { get; }
 	}
 	public struct Var
 	{
 		public Var(bool isPtr, Object value)
 		{
-			this.isPtr = isPtr;
-			this.value = value;
+			this.IsPtr = isPtr;
+			this.Value = value;
 		}
-		public bool isPtr { get; set; }
-		public Object value { get; set; }
+		public bool IsPtr { get; set; }
+		public Object Value { get; set; }
 
-		public override string ToString() { return isPtr.ToString() + value.ToString(); }
+		public override string ToString() { return IsPtr.ToString() + Value.ToString(); }
 	}
 
 }

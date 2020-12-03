@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using static LookupTable;
 
 namespace InterpreterCore
@@ -34,9 +33,9 @@ namespace InterpreterCore
 			if (Numbers.Peek() is string)
 			{
 				string var = (string)Numbers.Pop();
-				op2 = ((string)var, lt.getVarValue((string)var));
+				op2 = ((string)var, lt.GetVarValue((string)var));
 				//op2IsVar = true;
-				operand2 = lt.getVarValue((string)var);
+				operand2 = lt.GetVarValue((string)var);
 			}
 			else
 			{
@@ -45,8 +44,8 @@ namespace InterpreterCore
 			if (Numbers.Peek() is string)
 			{
 				string var = (string)Numbers.Pop();
-				op1 = ((string)var, lt.getVarValue((string)var));
-				operand1 = lt.getVarValue((string)var);
+				op1 = ((string)var, lt.GetVarValue((string)var));
+				operand1 = lt.GetVarValue((string)var);
 			}
 			else
 			{
@@ -84,7 +83,7 @@ namespace InterpreterCore
 					break;
 
 				case Tokens.Equal:
-					lt.updateVariable(key: op1.Item1, operand2);
+					lt.UpdateVariable(key: op1.Item1, operand2);
 					break;
 			}
 		}
@@ -95,22 +94,22 @@ namespace InterpreterCore
 
 			while (count < lt.symbols.Length)
 			{
-				switch (lt.getSymbol(count).type)
+				switch (lt.GetSymbol(count).Type)
 				{
 					case Tokens.Integer:
-						Numbers.Push(lt.getSymbol(count++).value);
+						Numbers.Push(lt.GetSymbol(count++).Value);
 						break;
 
 					case Tokens.Float:
-						Numbers.Push(lt.getSymbol(count++).value);
+						Numbers.Push(lt.GetSymbol(count++).Value);
 						break;
 
 					case Tokens.Variable:
-						Numbers.Push(lt.getSymbol(count++).value);
+						Numbers.Push(lt.GetSymbol(count++).Value);
 						break;
 
 					case Tokens.Equal:
-						Operators.Push(lt.getSymbol(count++).type);
+						Operators.Push(lt.GetSymbol(count++).Type);
 						break;
 
 					case Tokens.Plus:
@@ -118,7 +117,7 @@ namespace InterpreterCore
 						{
 							Calculate();
 						}
-						Operators.Push(lt.getSymbol(count++).type);
+						Operators.Push(lt.GetSymbol(count++).Type);
 						break;
 
 					case LookupTable.Tokens.Minus:
@@ -126,7 +125,7 @@ namespace InterpreterCore
 						{
 							Calculate();
 						}
-						Operators.Push(lt.getSymbol(count++).type);
+						Operators.Push(lt.GetSymbol(count++).Type);
 						break;
 
 					case LookupTable.Tokens.Exponent:
@@ -136,7 +135,7 @@ namespace InterpreterCore
 						{
 							Calculate();
 						}
-						Operators.Push(lt.getSymbol(count++).type);
+						Operators.Push(lt.GetSymbol(count++).Type);
 						break;
 
 
@@ -147,7 +146,7 @@ namespace InterpreterCore
 						{
 							Calculate();
 						}
-						Operators.Push(lt.getSymbol(count++).type);
+						Operators.Push(lt.GetSymbol(count++).Type);
 						break;
 
 					case LookupTable.Tokens.Divide:
@@ -157,11 +156,11 @@ namespace InterpreterCore
 						{
 							Calculate();
 						}
-						Operators.Push(lt.getSymbol(count++).type);
+						Operators.Push(lt.GetSymbol(count++).Type);
 						break;
 
 					case LookupTable.Tokens.Left_Para:
-						Operators.Push(lt.getSymbol(count++).type);
+						Operators.Push(lt.GetSymbol(count++).Type);
 						break;
 
 					case LookupTable.Tokens.Right_Para:
@@ -193,13 +192,6 @@ namespace InterpreterCore
 			}
 			else
 			{
-				var list = lt.variables.ToList();
-
-				foreach (KeyValuePair<string, LookupTable.Var> temp in list)
-				{
-					Console.WriteLine("{0} -> {1}", temp.Key, temp.Value.value);
-				}
-
 				return "Variable assignment";
 			}
 		}

@@ -11,7 +11,7 @@ public class ParsedTrie
 
 	public ParsedTrie()
 	{
-		root = new ParsedTrieNode(0, Tokens.EMPTY, null);
+		root = new ParsedTrieNode(0, Tokens.EMPTY, null); ;
 	}
 
 	public void AddNewNode(int depth, Object parentValue, Object value)
@@ -93,8 +93,6 @@ public class ParsedTrie
 
 	}
 
-
-
 	public class ParsedTrieNode
 	{
 		public int Depth { get; set; }
@@ -141,7 +139,13 @@ public class ParsedTrie
 
 		public override string ToString()
 		{
-			return this.Depth + " " + this.Value.ToString();
+			string ret = "";
+			for (int i = Depth; i > 0; i--)
+			{
+				ret += "-";
+			}
+
+			return ret + this.Value.ToString();
 		}
 
 		public bool IsString()
