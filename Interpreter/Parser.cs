@@ -5,7 +5,7 @@ public class Parser
 {
 	int LookAhead;
 	int currentToken;
-	bool ret;
+	string ret;
 	LookupTable lt;
 	ParsedTrie ParsedTrie;
 	ParsedTrie AST;
@@ -15,7 +15,7 @@ public class Parser
 	{
 		this.LookAhead = -1;
 		this.currentToken = 0;
-		this.ret = true;
+		this.ret = "Parsed";
 		this.lt = lt;
 		ParsedTrie = new ParsedTrie();
 	}
@@ -33,12 +33,12 @@ public class Parser
 	 *  <variable> ::= id
 	 */
 
-	public bool Parse()
+	public string Parse()
 	{
 		/*Check that lt is parsed correctly 
 		*/
-		Expression(0);
-		ParsedTrie.PrintWidthFirst();
+		Statement(0);
+		//ParsedTrie.PrintWidthFirst();
 		return ret;
 
 	}
@@ -55,6 +55,20 @@ public class Parser
 		this.LookAhead = (int)lt.symbols[++currentToken].type;
 	}
 
+	void Statement(int level)
+	{
+		//trie.AddNewNode(level, LookupTable.Tokens.EMPTY, "<<Statement>>");
+		Variable(level + 1, true);
+
+		if (Match_Token((int)LookupTable.Tokens.Equal))
+		{
+		//	trie.AddNewNode(level + 1, "<<Statement>>", LookupTable.Tokens.Equal);
+			Advance_LookAhead();
+		}
+
+		Expression(level + 1);
+	}
+
 	void Expression(int level)
 	{
 		//Console.WriteLine("Expression() Called at level {0}", level);
@@ -66,17 +80,9 @@ public class Parser
 		{
 			ParsedTrie.AddNewNode(level, "<<Factor>>", "<<Expression>>");
 		}
-		Variable(level+1);
 		Term(level + 1, true);
 		Expression_Prime(level + 1);
 	}
-
-	void Variable(int level)
-	{
-
-	}
-
-
 
 	void Expression_Prime(int level)
 	{
@@ -164,6 +170,7 @@ public class Parser
 		}
 		if (Match_Token((int)LookupTable.Tokens.Variable))
 		{
+			Variable(level + 1, false);
 		}
 		else if (Match_Token((int)LookupTable.Tokens.Left_Para))
 		{
@@ -173,7 +180,33 @@ public class Parser
 			{
 				Advance_LookAhead();
 			}
-			else ret = false;
+			else ret = "ERROR: Missing closing bracket";
+		}
+		else ret = "ERROR: Missing factor";
+	}
+
+	void Variable(int level, bool statement)
+	{
+		if (Match_Token((int)LookupTable.Tokens.Variable))
+		{
+			if (statement)
+			{
+				//trie.AddNewNode(level + 1, "<<Statement>>", lt.getSymbol(currentToken).value);
+				lt.addToVariables((string)lt.getSymbol(currentToken).value, new Var(false, 0)); ;
+				Advance_LookAhead();
+			}
+			else
+			{
+				if (lt.variableExist((string)lt.getSymbol(currentToken).value))
+				{
+					//trie.AddNewNode(level + 1, "<<Factor>>", lt.getSymbol(currentToken).value);
+				}
+				else
+				{
+					ret = "ERROR: Variable " + lt.getSymbol(currentToken).value + " not initialised";
+				}
+				Advance_LookAhead();
+			}
 		}
 	}
 }

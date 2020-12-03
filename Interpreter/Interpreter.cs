@@ -1,7 +1,5 @@
 ﻿using System;
-using static Lexer;
-using static Parser;
-using static LookupTable;
+using InterpreterCore;
 
 namespace Interpreter
 {
@@ -31,26 +29,26 @@ namespace Interpreter
                 if (((NO_tokens = lex.Process())) > 1) {
                     Console.WriteLine("{0} tokens found!", NO_tokens);
 
-                   /*
-                    for (int i = 0; i < NO_tokens; i++)
-                    {
-                        Console.WriteLine("Token {0} = ID,Value {1} -> {2}", i, lt.symbols[i].type, lt.symbols[i].value);
-                    }
-                   */
 
                     //Parser
                     Console.WriteLine("Parser started");
                     Parser parser = new Parser(ref lt);
-                    Console.WriteLine(parser.Parse());
+                    string parseResult = parser.Parse();
+                    Console.WriteLine(parseResult);
+                    if (parseResult == "Parsed")
+                    {
+                       //Executor
+                        //Console.WriteLine("Executor started");
+                        Executor executor = new Executor(ref lt);
+                        Object result = executor.ShuntYard();
 
-                    //Executor
-                    Console.WriteLine("Executor started");
-                    //Executor executor = new Executor(ref lt);
-                    //double result = executor.ShuntYard();
+                        lt.resetSymbols(MAX_TOKENS);
 
-                    //Console.WriteLine("answer is -> {0} \n", result);
-                
-                }else
+                        Console.WriteLine("answer is -> {0} \n", result);
+
+                    }
+                }
+                else
                     Console.WriteLine("No tokens were found?!");
 
         }

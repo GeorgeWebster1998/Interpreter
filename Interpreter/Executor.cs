@@ -1,145 +1,209 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using static LookupTable;
-using static LookupTable.Tokens;
-public class Executor
+
+namespace InterpreterCore
 {
-	LookupTable lt;
-	Stack Operators;
-	Stack Numbers;
-	double operand1, operand2;
-	LookupTable.Tokens operatorID;
 
-	public Executor(ref LookupTable lt)
+	public class Executor
 	{
-		this.lt = lt;
-		Operators = new Stack();
-		Numbers = new Stack();
-		operand1 = operand2 = 0;
-		operatorID = LookupTable.Tokens.EMPTY;
-	}
+		LookupTable lt;
+		Stack Operators;
+		Stack Numbers;
+		double operand1, operand2;
+		Tokens operatorID;
 
-	public void Calculate()
-	{
-		operatorID = (LookupTable.Tokens)Operators.Pop();
-		operand2 = Convert.ToDouble(Numbers.Pop());
-		operand1 = Convert.ToDouble(Numbers.Pop());
-		switch (operatorID)
+		public Executor(ref LookupTable lt)
 		{
-			case LookupTable.Tokens.Plus:
-				Numbers.Push(operand1 + operand2);
-				break;
-			
-			case LookupTable.Tokens.Minus:
-				Numbers.Push(operand1 - operand2);
-				break;
-
-			case LookupTable.Tokens.Exponent:
-				Numbers.Push(Math.Pow(operand1, operand2));
-				break;
-
-			case LookupTable.Tokens.Multiply:
-				Numbers.Push(operand1 * operand2);
-				break;
-
-			case LookupTable.Tokens.Divide:
-				Numbers.Push(operand1 / operand2);
-				break;
+			this.lt = lt;
+			Operators = new Stack();
+			Numbers = new Stack();
+			operand1 = operand2 = 0;
+			operatorID = Tokens.EMPTY;
 		}
-	}
 
-	public double ShuntYard()
-	{
-		int count = 0;
-
-		while (count < lt.symbols.Length)
+		public void Calculate()
 		{
-			switch (lt.symbols[count].type)
+			(string, double) op2 = ("", 0);
+			(string, double) op1 = ("", 0);
+
+			operatorID = (Tokens)Operators.Pop();
+
+			if (Numbers.Peek() is string)
 			{
-				case Integer:
-					Numbers.Push(lt.symbols[count++].value);
+				string var = (string)Numbers.Pop();
+				op2 = ((string)var, lt.getVarValue((string)var));
+				//op2IsVar = true;
+				operand2 = lt.getVarValue((string)var);
+			}
+			else
+			{
+				operand2 = Convert.ToDouble(Numbers.Pop());
+			}
+			if (Numbers.Peek() is string)
+			{
+				string var = (string)Numbers.Pop();
+				op1 = ((string)var, lt.getVarValue((string)var));
+				operand1 = lt.getVarValue((string)var);
+			}
+			else
+			{
+				operand1 = Convert.ToDouble(Numbers.Pop());
+			}
+
+
+			double result = 0;
+			switch (operatorID)
+			{
+				case Tokens.Plus:
+					result = operand1 + operand2;
+					Numbers.Push(result);
 					break;
 
-				case Float:
-					Numbers.Push(lt.symbols[count++].value);
+				case Tokens.Minus:
+					result = operand1 - operand2;
+					Numbers.Push(result);
 					break;
 
-				case Equal:
-
-					count++;
+				case Tokens.Exponent:
+					result = Math.Pow(operand1, operand2);
+					Numbers.Push(result);
 					break;
 
-				case Plus:
-					while (Operators.Count > 0 && (LookupTable.Tokens)Operators.Peek() != Left_Para)
-					{
-						Calculate();
-					}
-					Operators.Push(lt.symbols[count++].type);
-					break;
-
-				case Minus:
-					while (Operators.Count > 0 && (LookupTable.Tokens)Operators.Peek() != Left_Para)
-					{
-						Calculate();
-					}
-					Operators.Push(lt.symbols[count++].type);
-					break;
-
-				case Exponent:
-					while (Operators.Count > 0 && (LookupTable.Tokens)Operators.Peek() != Left_Para)
-					{
-						Calculate();
-					}
-					Operators.Push(lt.symbols[count++].type);
+				case Tokens.Multiply:
+					result = operand1 * operand2;
+					Numbers.Push(result);
 					break;
 
 
-				case Multiply:
-					while (Operators.Count > 0 && (LookupTable.Tokens)Operators.Peek() != Left_Para 
-						&& (LookupTable.Tokens)Operators.Peek() != Plus && (LookupTable.Tokens)Operators.Peek() != Minus)
-					{
-						Calculate();
-					}
-					Operators.Push(lt.symbols[count++].type);
+				case Tokens.Divide:
+					result = operand1 / operand2;
+					Numbers.Push(result);
 					break;
 
-				case Divide:
-					while (Operators.Count > 0 && (LookupTable.Tokens)Operators.Peek() != Left_Para
-						&& (LookupTable.Tokens)Operators.Peek() != Plus && (LookupTable.Tokens)Operators.Peek() != Minus)
-					{
-						Calculate();
-					}
-					Operators.Push(lt.symbols[count++].type);
-					break;
-
-				case Left_Para:
-					Operators.Push(lt.symbols[count++].type);
-					break;
-
-				case Right_Para:
-					while (Operators.Count > 0 && (LookupTable.Tokens)Operators.Peek() != Left_Para)
-					{
-						Calculate();
-					}
-					if ((LookupTable.Tokens)Operators.Peek() == Left_Para)
-					{
-						Operators.Pop();
-					}
-					count++;
-					break;
-
-				default:
-					count++;
+				case Tokens.Equal:
+					lt.updateVariable(key: op1.Item1, operand2);
 					break;
 			}
 		}
-		while (Operators.Count > 0)
+
+		public Object ShuntYard()
 		{
-			Calculate();
+			int count = 0;
+
+			while (count < lt.symbols.Length)
+			{
+				switch (lt.getSymbol(count).type)
+				{
+					case Tokens.Integer:
+						Numbers.Push(lt.getSymbol(count++).value);
+						break;
+
+					case Tokens.Float:
+						Numbers.Push(lt.getSymbol(count++).value);
+						break;
+
+					case Tokens.Variable:
+						Numbers.Push(lt.getSymbol(count++).value);
+						break;
+
+					case Tokens.Equal:
+						Operators.Push(lt.getSymbol(count++).type);
+						break;
+
+					case Tokens.Plus:
+						while (Operators.Count > 0 && (Tokens)Operators.Peek() != Tokens.Left_Para && (Tokens)Operators.Peek() != Tokens.Equal)
+						{
+							Calculate();
+						}
+						Operators.Push(lt.getSymbol(count++).type);
+						break;
+
+					case LookupTable.Tokens.Minus:
+						while (Operators.Count > 0 && (Tokens)Operators.Peek() != Tokens.Left_Para && (Tokens)Operators.Peek() != Tokens.Equal)
+						{
+							Calculate();
+						}
+						Operators.Push(lt.getSymbol(count++).type);
+						break;
+
+					case LookupTable.Tokens.Exponent:
+						while (Operators.Count > 0 && (Tokens)Operators.Peek() != Tokens.Left_Para
+							&& (Tokens)Operators.Peek() != Tokens.Plus && (Tokens)Operators.Peek() != Tokens.Minus
+							&& (Tokens)Operators.Peek() != Tokens.Equal)
+						{
+							Calculate();
+						}
+						Operators.Push(lt.getSymbol(count++).type);
+						break;
+
+
+					case LookupTable.Tokens.Multiply:
+						while (Operators.Count > 0 && (Tokens)Operators.Peek() != Tokens.Left_Para
+							&& (Tokens)Operators.Peek() != Tokens.Plus && (Tokens)Operators.Peek() != Tokens.Minus
+							&& (Tokens)Operators.Peek() != Tokens.Equal)
+						{
+							Calculate();
+						}
+						Operators.Push(lt.getSymbol(count++).type);
+						break;
+
+					case LookupTable.Tokens.Divide:
+						while (Operators.Count > 0 && (Tokens)Operators.Peek() != Tokens.Left_Para
+							&& (Tokens)Operators.Peek() != Tokens.Plus && (Tokens)Operators.Peek() != Tokens.Minus
+							&& (Tokens)Operators.Peek() != Tokens.Equal)
+						{
+							Calculate();
+						}
+						Operators.Push(lt.getSymbol(count++).type);
+						break;
+
+					case LookupTable.Tokens.Left_Para:
+						Operators.Push(lt.getSymbol(count++).type);
+						break;
+
+					case LookupTable.Tokens.Right_Para:
+						while (Operators.Count > 0 && (LookupTable.Tokens)Operators.Peek() != LookupTable.Tokens.Left_Para)
+						{
+							Calculate();
+						}
+						if ((LookupTable.Tokens)Operators.Peek() == LookupTable.Tokens.Left_Para)
+						{
+							Operators.Pop();
+						}
+						count++;
+						break;
+
+					default:
+						count++;
+						break;
+				}
+			}
+			while (Operators.Count > 0)
+			{
+				Calculate();
+			}
+
+
+			if (Numbers.Count == 1)
+			{
+				return Convert.ToDouble(Numbers.Pop());
+			}
+			else
+			{
+				var list = lt.variables.ToList();
+
+				foreach (KeyValuePair<string, LookupTable.Var> temp in list)
+				{
+					Console.WriteLine("{0} -> {1}", temp.Key, temp.Value.value);
+				}
+
+				return "Variable assignment";
+			}
 		}
-		return Convert.ToDouble(Numbers.Pop());
+
+
 	}
-	
-
-
 }

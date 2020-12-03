@@ -75,23 +75,7 @@ public class Lexer
 						lt.symbols[token_i++] = new Symbol(Right_Para, 0);
 						break;
 					}
-				case ('{'): //Used to add the left curly bracket to the token array
-					{
-						lt.symbols[token_i++] = new Symbol(Left_Curly, 0);
-						break;
-					}
-
-				case ('}'): //Used to add the right curly bracket to the token array
-					{
-						lt.symbols[token_i++] = new Symbol(Right_Curly, 0);
-						break;
-					}
-				case (','): //Used to add the right curly bracket to the token array
-					{
-						lt.symbols[token_i++] = new Symbol(Comma, 0);
-						break;
-					}
-
+	
 
 				default: //If no symbol above is found
 					{
@@ -112,7 +96,7 @@ public class Lexer
 								varName += input[i];
 								++i;
 							}
-							lt.symbols[token_i++] = new Symbol(Tokens.Variable, 0, new Symbol.Var(varName, false, 0));
+							lt.symbols[token_i++] = new Symbol(Tokens.Variable, varName);
 							--i;
 							break;
 						}
