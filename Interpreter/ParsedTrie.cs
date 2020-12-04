@@ -7,11 +7,13 @@ using static LookupTable.Symbol;
 public class ParsedTrie
 {
 	ParsedTrieNode root;
+	public int deepest_node;
 	public int id_count;
 
 	public ParsedTrie()
 	{
-		root = new ParsedTrieNode(0, Tokens.EMPTY, null); ;
+		root = new ParsedTrieNode(0, Tokens.EMPTY, null);
+		deepest_node = 0;
 	}
 
 	public void AddNewNode(int depth, Object parentValue, Object value)
@@ -26,6 +28,10 @@ public class ParsedTrie
 			if (node.Value == parentValue && node.Depth == depth - 1)
 			{
 				node.Children.Add(new ParsedTrieNode(depth, parentValue, value));
+				if (depth > deepest_node)
+				{
+					deepest_node = depth;
+				}
 				return;
 			}
 			else
@@ -49,6 +55,8 @@ public class ParsedTrie
 		ArrayList toVisit = new ArrayList(root.Children);
 		ArrayList Visited = new ArrayList();
 
+		Console.WriteLine("#########");
+
 		while (toVisit.Count != 0)
 		{
 			ParsedTrieNode node = (ParsedTrieNode)toVisit[0];
@@ -64,6 +72,8 @@ public class ParsedTrie
 			toVisit.Remove(node);
 			Visited.Add(node);
 		}
+
+		Console.WriteLine("#########");
 	}
 
 	public void PrintDepthFirst()
@@ -71,6 +81,8 @@ public class ParsedTrie
 		ArrayList toVisit = new ArrayList(root.Children);
 		ArrayList Visited = new ArrayList();
 		ArrayList AddList = new ArrayList();
+
+		Console.WriteLine("#########");
 
 		while (toVisit.Count != 0)
 		{
@@ -86,11 +98,48 @@ public class ParsedTrie
 			}
 			toVisit.Remove(node);
 			toVisit.InsertRange(0, AddList);
-			AddList.Reverse();
 			Visited.Add(node);
 			AddList.Clear();
 		}
 
+		Console.WriteLine("#########");
+
+	}
+
+	public ParsedTrie ToAbstractSyntaxTree()
+	{
+		ArrayList toVisit = new ArrayList(root.Children);
+		ArrayList Visited = new ArrayList();
+		ParsedTrie AST = new ParsedTrie();
+		Tokens Parent = Tokens.EMPTY;
+
+		while (toVisit.Count != 0)
+		{
+			ParsedTrieNode node = (ParsedTrieNode)toVisit[0];
+
+			if (!(node.Value is string))
+			{
+				AST.AddNewNode(node.Depth, Parent, node.Value);
+
+				if (node.Value is Tokens)
+				{
+					Parent = (Tokens)node.Value;
+				}
+			}
+
+			if (node.IsLeaf() == false)
+			{
+				foreach (ParsedTrieNode toAdd in node.Children)
+				{
+					if (!Visited.Contains(toAdd))
+						toVisit.Add(toAdd);
+				}
+			}
+			toVisit.Remove(node);
+			Visited.Add(node);
+		}
+
+		return AST;
 	}
 
 	public class ParsedTrieNode

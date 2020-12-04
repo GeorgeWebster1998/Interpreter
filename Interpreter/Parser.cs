@@ -62,7 +62,10 @@ public class Parser
 		if (lt.GetSymbol(1).Type == Tokens.Equal)
 		{
 			trie.AddNewNode(level, Tokens.EMPTY, "<<Statement>>");
-			Variable(level + 1, true);
+			if (!(Variable(level + 1, true))){
+				ret = "Not assigning variable " + lt.symbols[currentToken].Type;
+				return;
+			}
 			isStatement = true;
 
 			if (Match_Token((int) Tokens.Equal))
@@ -202,15 +205,16 @@ public class Parser
 		else ret = "Missing factor";
 	}
 
-	void Variable(int level, bool statement)
+	bool Variable(int level, bool statement)
 	{
 		if (Match_Token((int)LookupTable.Tokens.Variable))
 		{
 			if (statement)
 			{
 				trie.AddNewNode(level, "<<Statement>>", (string)lt.GetSymbol(currentToken).Value);
-				lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, new Var(false, (double)0)); ;
+				lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, new Var(false, (double)0)); 
 				Advance_LookAhead();
+				return true;
 			}
 			else
 			{
@@ -218,6 +222,7 @@ public class Parser
 				{
 					string varName = (string)lt.GetSymbol(currentToken).Value;
 					trie.AddNewNode(level+1, "<<Factor>>", (string)varName + " -> " + lt.GetVarValue(varName));
+					return true;
 				}
 				else
 				{
@@ -226,5 +231,6 @@ public class Parser
 				Advance_LookAhead();
 			}
 		}
+		return false;
 	}
 }

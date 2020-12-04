@@ -18,8 +18,9 @@ public class Lexer
 
 	public int Process()
 	{
+		int input_length = input.Length;
 		int token_i = 0; //Token Counter
-		for (int i = 0; input[i]!='\n'; ++i) //For loop to go through input
+		for (int i = 0; i < input_length; ++i) //For loop to go through input
 		{
 			if (token_i == MAX_TOKENS) //If token count is the same size as max tokens stop the lexer 
 				break;
@@ -93,8 +94,12 @@ public class Lexer
 							string varName = "";
 							while (Char.IsLetter(input[i]))
 							{
-								varName += input[i];
-								++i;
+								varName += input[i++];
+
+								if (i >= input.Length)
+								{
+									break;
+								}
 							}
 							lt.symbols[token_i++] = new Symbol(Tokens.Variable, varName);
 							--i;
@@ -116,8 +121,13 @@ public class Lexer
 								if (input[i] == '.')
 									isFloat = true;
 
-								number[number_counter++] = input[i];
-								++i;
+								number[number_counter++] = input[i++];
+								
+								if (i >= input.Length)
+								{
+									break;
+								}
+
 							}
 							if (isFloat)
 							{
@@ -135,7 +145,7 @@ public class Lexer
 			}
 
 		}
-		int fill_array=token_i;
+		int fill_array = token_i;
 		while (fill_array < lt.symbols.Length)
 		{
 			lt.symbols[fill_array++] = new Symbol(Tokens.EMPTY, 0);

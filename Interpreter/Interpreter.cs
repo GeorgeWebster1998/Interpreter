@@ -18,11 +18,12 @@ namespace Interpreter
             {
                 //Input
                 Console.WriteLine("Try the interpreter");
-                char[] input = new char[MAX_CHAR];
-                Console.In.Read(input);
-
+                string SIn = Console.ReadLine();
+                char[] input = SIn.ToCharArray();
+                
+                
                 //Testing input
-                //Console.WriteLine("Input was {0}", new string(inputRaw));
+                //Console.WriteLine("Input was {0}", new string(input));
                 //Test over for input
 
                 //LEXER
