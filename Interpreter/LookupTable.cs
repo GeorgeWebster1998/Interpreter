@@ -16,14 +16,19 @@ public class LookupTable
 		Left_Para = 7,
 		Right_Para = 8,
 		Integer = 9,
-		Float = 10,
+		Double = 10,
 		Variable = 11
 	}
 
 	public Symbol[] symbols;
-	public Dictionary<String, Var> variables = new Dictionary<string, Var>();
+	public Dictionary<String, Var> variables;
 
-	public LookupTable(int MAX_TOKENS)
+	public LookupTable()
+	{
+	variables = new Dictionary<string, Var>();
+	}
+
+	public void InitSymbols(int MAX_TOKENS)
 	{
 		symbols = new Symbol[MAX_TOKENS];
 	}
@@ -78,6 +83,11 @@ public class LookupTable
 
 		public Tokens Type { get; }
 		public Object Value { get; }
+
+		public override string ToString()
+		{
+			return this.Type.ToString();
+		}
 	}
 	public struct Var
 	{

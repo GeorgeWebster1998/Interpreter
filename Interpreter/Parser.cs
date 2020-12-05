@@ -57,16 +57,14 @@ public class Parser
 
 	void Statement(int level)
 	{
-		bool isStatement = false;
 
 		if (lt.GetSymbol(1).Type == Tokens.Equal)
 		{
 			trie.AddNewNode(level, Tokens.EMPTY, "<<Statement>>");
 			if (!(Variable(level + 1, true))){
-				ret = "Not assigning variable " + lt.symbols[currentToken].Type;
+				ret = "Can't assign data to " + lt.symbols[currentToken].Type;
 				return;
 			}
-			isStatement = true;
 
 			if (Match_Token((int) Tokens.Equal))
 			{
@@ -74,11 +72,7 @@ public class Parser
 				Advance_LookAhead();
 			}
 
-		}
-
-		if (isStatement)
-		{
-			Expression(level+1);
+			Expression(level + 1);
 		}
 		else
 		{
@@ -92,6 +86,10 @@ public class Parser
 		if (level == 1)
 		{
 			trie.AddNewNode(level, "<<Statement>>", "<<Expression>>");
+		}
+		else if (level == 0)
+		{
+			trie.AddNewNode(level, Tokens.EMPTY, "<<Expression>>");
 		}
 		else
 		{
@@ -183,9 +181,9 @@ public class Parser
 			trie.AddNewNode(level + 1, "<<Factor>>", lt.GetSymbol(currentToken).Value);
 			Advance_LookAhead();
 		}
-		else if (Match_Token((int)LookupTable.Tokens.Float))
+		else if (Match_Token((int)LookupTable.Tokens.Double))
 		{
-			trie.AddNewNode(level + 1, "<<Factor>>", (string)lt.GetSymbol(currentToken).Value);
+			trie.AddNewNode(level + 1, "<<Factor>>", lt.GetSymbol(currentToken).Value);
 			Advance_LookAhead();
 		}
 		else if (Match_Token((int)LookupTable.Tokens.Variable))
@@ -205,11 +203,11 @@ public class Parser
 		else ret = "Missing factor";
 	}
 
-	bool Variable(int level, bool statement)
+	bool Variable(int level, bool isStatement)
 	{
 		if (Match_Token((int)LookupTable.Tokens.Variable))
 		{
-			if (statement)
+			if (isStatement)
 			{
 				trie.AddNewNode(level, "<<Statement>>", (string)lt.GetSymbol(currentToken).Value);
 				lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, new Var(false, (double)0)); 
@@ -222,6 +220,7 @@ public class Parser
 				{
 					string varName = (string)lt.GetSymbol(currentToken).Value;
 					trie.AddNewNode(level+1, "<<Factor>>", (string)varName + " -> " + lt.GetVarValue(varName));
+					Advance_LookAhead();
 					return true;
 				}
 				else

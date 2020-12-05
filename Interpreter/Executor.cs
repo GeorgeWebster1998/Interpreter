@@ -100,7 +100,7 @@ namespace InterpreterCore
 						Numbers.Push(lt.GetSymbol(count++).Value);
 						break;
 
-					case Tokens.Float:
+					case Tokens.Double:
 						Numbers.Push(lt.GetSymbol(count++).Value);
 						break;
 

@@ -9,32 +9,32 @@ namespace Interpreter
     {
         static void Main()
         {
-            int MAX_TOKENS = 32; //Maximum number of tokens the lexer will define
-            int MAX_CHAR = 32; //Maximum characters taken from input
-            LookupTable lt = new LookupTable(MAX_TOKENS); // Class to store Tokens and Symbols
-            int NO_tokens; //Number of tokens
-
+            LookupTable lt = new LookupTable(); // Class to store Tokens and Symbols
+            
             while (true)
             {
                 //Input
                 Console.WriteLine("Try the interpreter");
                 string SIn = Console.ReadLine();
                 char[] input = SIn.ToCharArray();
-                
-                
+
+                int MAX_TOKENS = SIn.Length; //Maximum number of tokens the lexer will define
+                int TokenCount; //Number of tokens
+                lt.InitSymbols(MAX_TOKENS);
+
                 //Testing input
                 //Console.WriteLine("Input was {0}", new string(input));
                 //Test over for input
 
                 //LEXER
                 Lexer lex = new Lexer(ref input, ref MAX_TOKENS, ref lt);
-                Console.WriteLine("Lexer started");
-                if (((NO_tokens = lex.Process())) > 1) {
-                    Console.WriteLine("{0} tokens found!", NO_tokens);
+                //Console.WriteLine("Lexer started");
+                if (((TokenCount = lex.Process())) > 1) {
+                    //Console.WriteLine("{0} tokens found!", TokenCount);
 
 
                     //Parser
-                    Console.WriteLine("Parser started");
+                    //Console.WriteLine("Parser started");
                     Parser parser = new Parser(ref lt);
                     string parseResult = parser.Parse();
                     if (parseResult == "p")

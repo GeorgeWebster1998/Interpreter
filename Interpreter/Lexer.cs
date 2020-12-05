@@ -82,7 +82,8 @@ public class Lexer
 					{
 						if (!Char.IsLetterOrDigit(input[i]))
 						{
-							break;
+							Console.WriteLine("ERROR IN LEXER: Unknown symbol {0}", input[i]);
+							return 0;
 						}
 						else if (Char.IsLetter(input[i]))
 						{
@@ -131,7 +132,7 @@ public class Lexer
 							}
 							if (isFloat)
 							{
-								lt.symbols[token_i++] = new Symbol(Float, float.Parse(new string(number)));
+								lt.symbols[token_i++] = new Symbol(Tokens.Double, double.Parse(new string(number)));
 							}
 							else
 							{
