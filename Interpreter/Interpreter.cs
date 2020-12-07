@@ -28,7 +28,9 @@ namespace Interpreter
                 //LEXER
                 Lexer lex = new Lexer(ref input, ref MAX_TOKENS, ref lt);
                 //Console.WriteLine("Lexer started");
-                if (((TokenCount = lex.Process())) > 1) {
+                (int, string) lexResult = lex.Process();
+
+                if ((TokenCount = lexResult.Item1) > 1) {
                     //Console.WriteLine("{0} tokens found!", TokenCount);
 
 
@@ -68,7 +70,7 @@ namespace Interpreter
                     }
                 }
                 else
-                    Console.WriteLine("No tokens were found?! \n");
+                    Console.WriteLine("Lexer failed with error: {0} \n", lexResult.Item2);
 
         }
 

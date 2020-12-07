@@ -16,10 +16,11 @@ public class Lexer
 		this.lt = lt;
 	}
 
-	public int Process()
+	public (int, string) Process()
 	{
 		int input_length = input.Length;
 		int token_i = 0; //Token Counter
+		string ret = "";
 		for (int i = 0; i < input_length; ++i) //For loop to go through input
 		{
 			if (token_i == MAX_TOKENS) //If token count is the same size as max tokens stop the lexer 
@@ -82,8 +83,7 @@ public class Lexer
 					{
 						if (!Char.IsLetterOrDigit(input[i]))
 						{
-							Console.WriteLine("ERROR IN LEXER: Unknown symbol {0}", input[i]);
-							return 0;
+							return (0, "Unknown symbol "+ input[i]);
 						}
 						else if (Char.IsLetter(input[i]))
 						{
@@ -138,8 +138,7 @@ public class Lexer
 								}
 								catch (OverflowException)
 								{
-									Console.WriteLine("Number is too big or small to be Double");
-									return 0;
+									return (0, "Number is too big or small to be Double");
 								}
 							}
 							else
@@ -150,8 +149,7 @@ public class Lexer
 								}
 								catch (OverflowException)
 								{
-									Console.WriteLine("Number is too big or small to be Int32") ;
-									return 0;
+									return (0, "Number is too big or small to be Int32");
 								}
 							}
 							--i;
@@ -169,7 +167,7 @@ public class Lexer
 		}
 
 
-		return token_i;
+		return (token_i, "true");
 	}
 
 
