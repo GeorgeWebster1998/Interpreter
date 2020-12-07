@@ -132,11 +132,27 @@ public class Lexer
 							}
 							if (isFloat)
 							{
-								lt.symbols[token_i++] = new Symbol(Tokens.Double, double.Parse(new string(number)));
+								try
+								{
+									lt.symbols[token_i++] = new Symbol(Tokens.Double, double.Parse(new string(number)));
+								}
+								catch (OverflowException)
+								{
+									Console.WriteLine("Number is too big or small to be Double");
+									return 0;
+								}
 							}
 							else
 							{
-								lt.symbols[token_i++] = new Symbol(Integer,int.Parse(new string(number)));
+								try
+								{
+									lt.symbols[token_i++] = new Symbol(Integer, int.Parse(new string(number)));
+								}
+								catch (OverflowException)
+								{
+									Console.WriteLine("Number is too big or small to be Int32") ;
+									return 0;
+								}
 							}
 							--i;
 							break;

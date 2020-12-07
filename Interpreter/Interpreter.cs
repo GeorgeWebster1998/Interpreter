@@ -9,7 +9,8 @@ namespace Interpreter
     {
         static void Main()
         {
-            LookupTable lt = new LookupTable(); // Class to store Tokens and Symbols
+            int MAX_TOKENS = 50;
+            LookupTable lt = new LookupTable(MAX_TOKENS); // Class to store Tokens and Symbols
             
             while (true)
             {
@@ -17,10 +18,8 @@ namespace Interpreter
                 Console.WriteLine("Try the interpreter");
                 string SIn = Console.ReadLine();
                 char[] input = SIn.ToCharArray();
-
-                int MAX_TOKENS = SIn.Length; //Maximum number of tokens the lexer will define
+                
                 int TokenCount; //Number of tokens
-                lt.InitSymbols(MAX_TOKENS);
 
                 //Testing input
                 //Console.WriteLine("Input was {0}", new string(input));

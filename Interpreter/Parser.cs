@@ -199,8 +199,10 @@ public class Parser
 				Advance_LookAhead();
 			}
 			else ret = "Missing closing bracket";
+			return;
 		}
 		else ret = "Missing factor";
+		return;
 	}
 
 	bool Variable(int level, bool isStatement)

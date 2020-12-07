@@ -23,9 +23,10 @@ public class LookupTable
 	public Symbol[] symbols;
 	public Dictionary<String, Var> variables;
 
-	public LookupTable()
+	public LookupTable(int MAX_TOKENS)
 	{
-	variables = new Dictionary<string, Var>();
+		symbols = new Symbol[MAX_TOKENS];
+		variables = new Dictionary<string, Var>();
 	}
 
 	public void InitSymbols(int MAX_TOKENS)
