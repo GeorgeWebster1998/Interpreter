@@ -7,45 +7,35 @@ namespace Interpreter
 {
     class Interpreter
     {
-        static void Main()
+        static void Main(string[] args)
         {
             int MAX_TOKENS = 50;
             LookupTable lt = new LookupTable(MAX_TOKENS); // Class to store Tokens and Symbols
-            
-            while (true)
+
+            int InputCount = args.Length;
+            string[] Inputs = new string[InputCount];  
+
+            (int,string) Errors = (0,"");
+
+            for (int i = 0; i < InputCount; i++)
             {
-                //Input
-                Console.WriteLine("Try the interpreter");
-                string SIn = Console.ReadLine();
-                char[] input = SIn.ToCharArray();
-                
+                Inputs[i] = args[i].Trim(new Char[] { '[', ',', '\'', ']' });
+                char[] line = Inputs[i].ToCharArray();
+
                 int TokenCount; //Number of tokens
-
-                //Testing input
-                //Console.WriteLine("Input was {0}", new string(input));
-                //Test over for input
-
-                //LEXER
-                Lexer lex = new Lexer(ref input, ref MAX_TOKENS, ref lt);
-                //Console.WriteLine("Lexer started");
+                Lexer lex = new Lexer(ref line, ref MAX_TOKENS, ref lt);
                 (int, string) lexResult = lex.Process();
 
-                if ((TokenCount = lexResult.Item1) > 1) {
-                    //Console.WriteLine("{0} tokens found!", TokenCount);
-
-
-                    //Parser
-                    //Console.WriteLine("Parser started");
+                if ((TokenCount = lexResult.Item1) > 1)
+                {
                     Parser parser = new Parser(ref lt);
                     string parseResult = parser.Parse();
                     if (parseResult == "p")
                     {
-                       //Executor
-                        //Console.WriteLine("Executor started");
                         Executor executor = new Executor(ref lt);
                         Object result = executor.ShuntYard();
 
-                        if(result is string)
+                        if (result is string)
                         {
                             var list = lt.variables.ToList();
 
@@ -53,7 +43,6 @@ namespace Interpreter
                             {
                                 Console.WriteLine("{0} -> {1}", temp.Key, temp.Value.Value);
                             }
-                            Console.WriteLine();
 
                         }
                         else
@@ -66,13 +55,20 @@ namespace Interpreter
                     }
                     else
                     {
-                        Console.WriteLine("Parser failed with error: {0} \n", parseResult);
+                        Errors.Item1 += 1;
+                        Errors.Item2 = String.Format("{0} Parser failed on arguement \"{1}\" with error: {2}. ", Errors.Item2, Inputs[i], parseResult);
                     }
                 }
                 else
-                    Console.WriteLine("Lexer failed with error: {0} \n", lexResult.Item2);
-
+                {
+                    Errors.Item1 += 1;
+                    Errors.Item2 = String.Format("{0} Lexer failed on arguement \"{1}\" with error: {2}. ", Errors.Item2, Inputs[i], lexResult.Item2);
+                }
         }
+
+        if (Errors.Item1 > 0){
+                Console.WriteLine(Errors.Item2);
+            }
 
         }
     }

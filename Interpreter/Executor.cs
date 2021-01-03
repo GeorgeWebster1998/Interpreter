@@ -76,7 +76,6 @@ namespace InterpreterCore
 					Numbers.Push(result);
 					break;
 
-
 				case Tokens.Divide:
 					result = operand1 / operand2;
 					Numbers.Push(result);
@@ -142,7 +141,7 @@ namespace InterpreterCore
 					case LookupTable.Tokens.Multiply:
 						while (Operators.Count > 0 && (Tokens)Operators.Peek() != Tokens.Left_Para
 							&& (Tokens)Operators.Peek() != Tokens.Plus && (Tokens)Operators.Peek() != Tokens.Minus
-							&& (Tokens)Operators.Peek() != Tokens.Equal)
+							&& (Tokens)Operators.Peek() != Tokens.Equal && (Tokens)Operators.Peek() != Tokens.Exponent)
 						{
 							Calculate();
 						}
@@ -152,7 +151,7 @@ namespace InterpreterCore
 					case LookupTable.Tokens.Divide:
 						while (Operators.Count > 0 && (Tokens)Operators.Peek() != Tokens.Left_Para
 							&& (Tokens)Operators.Peek() != Tokens.Plus && (Tokens)Operators.Peek() != Tokens.Minus
-							&& (Tokens)Operators.Peek() != Tokens.Equal)
+							&& (Tokens)Operators.Peek() != Tokens.Equal && (Tokens)Operators.Peek() != Tokens.Exponent)
 						{
 							Calculate();
 						}

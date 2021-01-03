@@ -20,7 +20,6 @@ public class Lexer
 	{
 		int input_length = input.Length;
 		int token_i = 0; //Token Counter
-		string ret = "";
 		for (int i = 0; i < input_length; ++i) //For loop to go through input
 		{
 			if (token_i == MAX_TOKENS) //If token count is the same size as max tokens stop the lexer 

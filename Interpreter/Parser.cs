@@ -38,7 +38,7 @@ public class Parser
 		/*Check that lt is parsed correctly 
 		*/
 		Statement(0);
-		trie.PrintDepthFirst();
+		lt.SetParsedTrie(trie);
 		return ret;
 
 	}

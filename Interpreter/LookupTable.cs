@@ -22,6 +22,7 @@ public class LookupTable
 
 	public Symbol[] symbols;
 	public Dictionary<String, Var> variables;
+	public ParsedTrie pt;
 
 	public LookupTable(int MAX_TOKENS)
 	{
@@ -72,6 +73,11 @@ public class LookupTable
 	public bool VariableExist(string key)
 	{
 		return variables.ContainsKey(key);
+	}
+
+	public void SetParsedTrie(ParsedTrie pt)
+	{
+		this.pt = pt;
 	}
 
 	public struct Symbol
