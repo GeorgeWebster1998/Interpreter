@@ -2,7 +2,7 @@
   "profiles": {
     "Interpreter": {
       "commandName": "Project",
-      "commandLineArgs": "[\"x5\", \"*+\"]"
+      "commandLineArgs": "expression, x=5, x+2]"
     }
   }
 }

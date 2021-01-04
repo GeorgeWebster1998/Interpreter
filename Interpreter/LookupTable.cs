@@ -52,7 +52,7 @@ public class LookupTable
 
 	public void UpdateVariable(string key, double value)
 	{
-		variables[key] = new Var(false, value);
+		variables[key] = new Var(value);
 	}
 
 	public double GetVarValue(string key)
@@ -98,15 +98,14 @@ public class LookupTable
 	}
 	public struct Var
 	{
-		public Var(bool isPtr, Object value)
+		public Var( Object value)
 		{
-			this.IsPtr = isPtr;
 			this.Value = value;
 		}
-		public bool IsPtr { get; set; }
 		public Object Value { get; set; }
 
-		public override string ToString() { return IsPtr.ToString() + Value.ToString(); }
+
+		public override string ToString() { return Value.ToString(); }
 	}
 
 }

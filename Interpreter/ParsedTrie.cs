@@ -8,12 +8,14 @@ public class ParsedTrie
 {
 	ParsedTrieNode root;
 	public int deepest_node;
-	public int id_count;
+	public double final_result;
+	public List<List<string>> width_first;
 
 	public ParsedTrie()
 	{
 		root = new ParsedTrieNode(0, Tokens.EMPTY, null);
-		deepest_node = 0;
+		final_result = 0;
+		width_first = new List<List<string>>();
 	}
 
 	public void AddNewNode(int depth, Object parentValue, Object value)
@@ -48,6 +50,38 @@ public class ParsedTrie
 				Visited.Add(node);
 			}
 		}
+	}
+
+	public void SetWidthFirst()
+	{
+		List<List<string>> list = new List<List<string>>();
+		for (int i = 0; i <= deepest_node; i++)
+		{
+			list.Add( new List<string>());
+		}
+
+		ArrayList toVisit = new ArrayList(root.Children);
+		ArrayList Visited = new ArrayList();
+
+		while (toVisit.Count != 0)
+		{
+			ParsedTrieNode node = (ParsedTrieNode)toVisit[0];
+
+			list[node.Depth].Add(node.ToString());
+			if (node.IsLeaf() == false)
+			{
+				foreach (ParsedTrieNode toAdd in node.Children)
+				{
+					if (!Visited.Contains(toAdd))
+						toVisit.Add(toAdd);
+				}
+			}
+			toVisit.Remove(node);
+			Visited.Add(node);
+		}
+
+		this.width_first = list;
+
 	}
 
 	public void PrintWidthFirst()
@@ -141,7 +175,7 @@ public class ParsedTrie
 
 		return AST;
 	}
-
+ 
 	public class ParsedTrieNode
 	{
 		public int Depth { get; set; }
@@ -188,19 +222,22 @@ public class ParsedTrie
 
 		public override string ToString()
 		{
+			/*
 			string ret = "";
 			for (int i = Depth; i > 0; i--)
 			{
 				ret += "-";
 			}
+			*/
 
-			return ret + this.Value.ToString();
+			return this.Value.ToString();
 		}
 
 		public bool IsString()
 		{
 			return this.Value is string;
 		}
+
 	}
 }
 

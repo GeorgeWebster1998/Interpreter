@@ -212,7 +212,7 @@ public class Parser
 			if (isStatement)
 			{
 				trie.AddNewNode(level, "<<Statement>>", (string)lt.GetSymbol(currentToken).Value);
-				lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, new Var(false, (double)0)); 
+				lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, new Var((double)0)); 
 				Advance_LookAhead();
 				return true;
 			}
