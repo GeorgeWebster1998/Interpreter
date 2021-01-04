@@ -60,13 +60,13 @@ namespace Interpreter
                     else
                     {
                         Errors.Item1 += 1;
-                        Errors.Item2 = String.Format("{0} Parser failed on arguement \"{1}\" with error: {2}. ", Errors.Item2, Inputs[i], parseResult);
+                        Errors.Item2 = String.Format("{0}Parser failed on arguement \"{1}\" with error: {2}. ", Errors.Item2, Inputs[i], parseResult);
                     }
                 }
                 else
                 {
                     Errors.Item1 += 1;
-                    Errors.Item2 = String.Format("{0} Lexer failed on arguement \"{1}\" with error: {2}. ", Errors.Item2, Inputs[i], lexResult.Item2);
+                    Errors.Item2 = String.Format("{0}Lexer failed on arguement \"{1}\" with error: {2}. ", Errors.Item2, Inputs[i], lexResult.Item2);
                 }
            }
             
