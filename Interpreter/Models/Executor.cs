@@ -8,7 +8,7 @@ namespace InterpreterCore
 
 	public class Executor
 	{
-		LookupTable lt;
+		readonly LookupTable lt;
 		Stack Operators;
 		Stack Numbers;
 		double operand1, operand2;

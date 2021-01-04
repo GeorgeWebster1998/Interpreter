@@ -3,10 +3,12 @@ using InterpreterCore;
 using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Microsoft.FSharp.Collections;
+
 
 namespace Interpreter
 {
-    class Interpreter
+    public class Interpreter
     {
         static void Main(string[] args)
         {
@@ -14,7 +16,27 @@ namespace Interpreter
             LookupTable lt = new LookupTable(MAX_TOKENS); // Class to store Tokens and Symbols
 
             string Command = args[0].Trim(new Char[] { '[', ',', '\'', ']' }); //Decides whats returned
-            //Console.WriteLine(Command);
+                                                                               //Console.WriteLine(Command);
+
+            if (Command == "rootofpoly")
+            {
+                double error = Double.Parse(args[1].Trim(new Char[] { '[', ',', '\'', ']' }));
+                double seed = Double.Parse(args[2].Trim(new Char[] { '[', ',', '\'', ']' }));
+                var inputs = new List<double>();
+
+                for (int i = 3; i < args.Length; i++)
+                {
+                    inputs.Add(Double.Parse(args[i].Trim(new Char[] { '[', ',', '\'', ']' })));
+                }
+
+                var fs_list = ListModule.OfSeq(inputs);
+                double result = NewtonRoot.CNewton(fs_list, seed, error);
+
+                Console.WriteLine(result);
+                Environment.Exit(1);
+            }
+
+
 
             int InputCount = args.Length;
             string[] Inputs = new string[InputCount];  
@@ -26,11 +48,10 @@ namespace Interpreter
                 Inputs[i] = args[i].Trim(new Char[] { '[', ',', '\'', ']' });
                 char[] line = Inputs[i].ToCharArray();
 
-                int TokenCount; //Number of tokens
                 Lexer lex = new Lexer(ref line, ref MAX_TOKENS, ref lt);
                 (int, string) lexResult = lex.Process();
 
-                if ((TokenCount = lexResult.Item1) > 1)
+                if (lexResult.Item1 > 1)
                 {
                     Parser parser = new Parser(ref lt);
                     string parseResult = parser.Parse();
@@ -39,17 +60,7 @@ namespace Interpreter
                         Executor executor = new Executor(ref lt);
                         Object result = executor.ShuntYard();
 
-                        if (result is string)
-                        {
-                            var list = lt.variables.ToList();
-
-                            foreach (KeyValuePair<string, LookupTable.Var> temp in list)
-                            {
-                                //Console.WriteLine("{0} -> {1}", temp.Key, temp.Value.Value);
-                            }
-
-                        }
-                        else
+                        if (!(result is string))
                         {
                             lt.pt.final_result = (double) result;
                         }

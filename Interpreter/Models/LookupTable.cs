@@ -62,7 +62,7 @@ public class LookupTable
 
 	public void AddToVariables(string key, Var value)
 	{
-		variables.TryAdd(key, value);
+		variables.Add(key, value);
 	}
 
 	public void ClearVariables()

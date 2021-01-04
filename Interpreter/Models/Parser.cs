@@ -8,8 +8,6 @@ public class Parser
 	string ret;
 	LookupTable lt;
 	ParsedTrie trie;
-	ParsedTrie AST;
-
 
 	public Parser(ref LookupTable lt)
 	{
