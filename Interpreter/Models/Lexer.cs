@@ -5,14 +5,14 @@ using static LookupTable.Tokens;
 
 public class Lexer
 {
-	char[] input; //Input parsed through reference
+	string input; //Input parsed through reference
 	LookupTable lt; //Lookup Table parsed thorugh reference
 	int MAX_TOKENS;
 
-	public Lexer(ref char[] input, ref int MAX_TOKENS, ref LookupTable lt)
+	public Lexer(ref string input, ref LookupTable lt)
 	{
 		this.input=input;
-		this.MAX_TOKENS = MAX_TOKENS;
+		this.MAX_TOKENS = lt.MAX_TOKENS;
 		this.lt = lt;
 	}
 
@@ -162,9 +162,8 @@ public class Lexer
 		int fill_array = token_i;
 		while (fill_array < lt.symbols.Length)
 		{
-			lt.symbols[fill_array++] = new Symbol(Tokens.EMPTY, 0);
+			lt.symbols[fill_array++] = new Symbol(Tokens.EMPTY, 0.0);
 		}
-
 
 		return (token_i, "true");
 	}

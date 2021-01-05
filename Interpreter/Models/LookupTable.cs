@@ -21,13 +21,15 @@ public class LookupTable
 	}
 
 	public Symbol[] symbols;
-	public Dictionary<String, Var> variables;
+	public Dictionary<String, object> variables;
 	public ParsedTrie pt;
+	public int MAX_TOKENS;
 
 	public LookupTable(int MAX_TOKENS)
 	{
+		this.MAX_TOKENS = MAX_TOKENS;
 		symbols = new Symbol[MAX_TOKENS];
-		variables = new Dictionary<string, Var>();
+		variables = new Dictionary<string, object>();
 	}
 
 	public void InitSymbols(int MAX_TOKENS)
@@ -52,15 +54,15 @@ public class LookupTable
 
 	public void UpdateVariable(string key, double value)
 	{
-		variables[key] = new Var(value);
+		variables[key] = value;
 	}
 
 	public double GetVarValue(string key)
 	{
-		return (double)variables[key].Value;
+		return Convert.ToDouble(variables[key]);
 	}
 
-	public void AddToVariables(string key, Var value)
+	public void AddToVariables(string key, object value)
 	{
 		variables.Add(key, value);
 	}
@@ -82,30 +84,18 @@ public class LookupTable
 
 	public struct Symbol
 	{
-		public Symbol(Tokens type, Object value)
+		public Symbol(Tokens type, object value)
 		{
 			this.Type = type;
 			this.Value = value;
 		}
 
 		public Tokens Type { get; }
-		public Object Value { get; }
+		public object Value { get; }
 
 		public override string ToString()
 		{
 			return this.Type.ToString();
 		}
 	}
-	public struct Var
-	{
-		public Var( Object value)
-		{
-			this.Value = value;
-		}
-		public Object Value { get; set; }
-
-
-		public override string ToString() { return Value.ToString(); }
-	}
-
 }

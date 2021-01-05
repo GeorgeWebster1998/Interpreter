@@ -57,7 +57,7 @@ public class ParsedTrie
 		List<List<string>> list = new List<List<string>>();
 		for (int i = 0; i <= deepest_node; i++)
 		{
-			list.Add( new List<string>());
+			list.Add(new List<string>());
 		}
 
 		ArrayList toVisit = new ArrayList(root.Children);
@@ -175,7 +175,7 @@ public class ParsedTrie
 
 		return AST;
 	}
- 
+
 	public class ParsedTrieNode
 	{
 		public int Depth { get; set; }
@@ -240,4 +240,3 @@ public class ParsedTrie
 
 	}
 }
-

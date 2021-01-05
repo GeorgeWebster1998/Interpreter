@@ -2,9 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net4.6.1</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <StartupObject>Interpreter.Interpreter</StartupObject>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn />
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +22,7 @@
     <Reference Include="FSharpLib">
       <HintPath>fs\FSharpLib.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>bin\Debug\net4.6.1\Newtonsoft.Json.dll</HintPath>
     </Reference>

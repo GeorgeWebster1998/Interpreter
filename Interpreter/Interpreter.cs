@@ -1,10 +1,8 @@
 ﻿using System;
-using InterpreterCore;
-using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Microsoft.FSharp.Collections;
-
+using Interpreter.Models;
 
 namespace Interpreter
 {
@@ -16,8 +14,7 @@ namespace Interpreter
             LookupTable lt = new LookupTable(MAX_TOKENS); // Class to store Tokens and Symbols
 
             string Command = args[0].Trim(new Char[] { '[', ',', '\'', ']' }); //Decides whats returned
-                                                                               //Console.WriteLine(Command);
-
+                                                                              
             if (Command == "rootofpoly")
             {
                 double error = Double.Parse(args[1].Trim(new Char[] { '[', ',', '\'', ']' }));
@@ -33,67 +30,101 @@ namespace Interpreter
                 double result = NewtonRoot.CNewton(fs_list, seed, error);
 
                 Console.WriteLine(result);
-                Environment.Exit(1);
+                return;
             }
-
-
-
-            int InputCount = args.Length;
-            string[] Inputs = new string[InputCount];  
-
-            (int,string) Errors = (0,"");
-
-            for (int i = 1; i < InputCount; i++)
+            else if(Command == "parse")
             {
-                Inputs[i] = args[i].Trim(new Char[] { '[', ',', '\'', ']' });
-                char[] line = Inputs[i].ToCharArray();
+                dynamic text = JsonConvert.DeserializeObject(args[1]);
 
-                Lexer lex = new Lexer(ref line, ref MAX_TOKENS, ref lt);
-                (int, string) lexResult = lex.Process();
+                Reply reply = null;
 
-                if (lexResult.Item1 > 1)
+                foreach(string s in text)
                 {
-                    Parser parser = new Parser(ref lt);
-                    string parseResult = parser.Parse();
-                    if (parseResult == "p")
+                    reply = Parse(ref lt, s);
+
+                    if (reply is ErrorReply)
                     {
-                        Executor executor = new Executor(ref lt);
-                        Object result = executor.ShuntYard();
+                        Console.WriteLine(JsonConvert.SerializeObject(reply));
+                        return;
+                    }
+                }
 
-                        if (!(result is string))
-                        {
-                            lt.pt.final_result = (double) result;
-                        }
+                Console.WriteLine(JsonConvert.SerializeObject(reply));
 
-                        lt.ResetSymbols(MAX_TOKENS);
+                return;
 
+            }
+            else if(Command == "expression")
+            {
+                dynamic text = JsonConvert.DeserializeObject(args[1]);
+
+                double final_result = 0.0;
+
+                foreach (string s in text)
+                {
+                    Reply reply = Parse(ref lt, s);
+
+                    if (reply is ErrorReply)
+                    {
+                        Console.WriteLine(JsonConvert.SerializeObject(reply));
+                        return;
                     }
                     else
                     {
-                        Errors.Item1 += 1;
-                        Errors.Item2 = String.Format("{0}Parser failed on arguement \"{1}\" with error: {2}. ", Errors.Item2, Inputs[i], parseResult);
+                        Executor executor = new Executor(ref lt);
+                        double result = executor.ShuntYard();
+
+                        final_result = result;
+                        lt.ResetSymbols(MAX_TOKENS);
+
                     }
+                }
+                lt.pt.SetWidthFirst();
+                new PositiveReply("good", lt.pt.width_first, lt.variables, final_result).PrintToConsole();
+                return;
+            }
+            else
+            {
+                Console.WriteLine("Unknown commands");
+            }
+        }
+        
+
+        public static Reply Parse(ref LookupTable lt, string s)
+        {
+            Lexer lex = new Lexer(ref s, ref lt);
+            (int, string) lexResult = lex.Process();
+
+            if (lexResult.Item1 > 0)
+            {
+
+                Parser parser = new Parser(ref lt);
+                string parseResult = parser.Parse();
+                if (parseResult == "p")
+                {
+                    Dictionary<string, object> variables = new Dictionary<string, object>();
+
+                    foreach (LookupTable.Symbol sym in lt.symbols)
+                    {
+                        if (sym.Type is LookupTable.Tokens.Variable)
+                        {
+                            variables.Add((string) sym.Value, null);
+                        }
+                    }
+                    return new PositiveReply("good", null, variables, 0);
                 }
                 else
                 {
-                    Errors.Item1 += 1;
-                    Errors.Item2 = String.Format("{0}Lexer failed on arguement \"{1}\" with error: {2}. ", Errors.Item2, Inputs[i], lexResult.Item2);
+                    return new ErrorReply("bad", "Parser Error", parseResult, s);
                 }
-           }
-            
-            if (Errors.Item1 > 0)
-            {
-                Console.WriteLine(Errors.Item2);
             }
-            else if (Command.Equals("expression"))
+            else
             {
-                lt.pt.SetWidthFirst();
-                Console.WriteLine(JsonConvert.SerializeObject(lt.pt));
-            }
-            else if (Command.Equals("statement"))
-            {
-                Console.WriteLine(JsonConvert.SerializeObject(lt.variables));
+                return new ErrorReply("bad", "Parser Error", lexResult.Item2, s);
             }
         }
+
+        
+
     }
 }

@@ -3,9 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using static LookupTable;
 
-namespace InterpreterCore
-{
-
 	public class Executor
 	{
 		readonly LookupTable lt;
@@ -87,7 +84,7 @@ namespace InterpreterCore
 			}
 		}
 
-		public Object ShuntYard()
+		public double ShuntYard()
 		{
 			int count = 0;
 
@@ -191,10 +188,9 @@ namespace InterpreterCore
 			}
 			else
 			{
-				return "Variable assignment";
+			return 0;
 			}
 		}
 
 
 	}
-}
