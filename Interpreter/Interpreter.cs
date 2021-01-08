@@ -17,19 +17,34 @@ namespace Interpreter
                                                                               
             if (Command == "rootofpoly")
             {
-                double error = Double.Parse(args[1].Trim(new Char[] { '[', ',', '\'', ']' }));
-                double seed = Double.Parse(args[2].Trim(new Char[] { '[', ',', '\'', ']' }));
+                dynamic text = JsonConvert.DeserializeObject(args[1]);
+
+                Reply reply;
+
+                double error = 0.0;
+                double seed = 0.0;
+                int count = 0;
+                
                 var inputs = new List<double>();
 
-                for (int i = 3; i < args.Length; i++)
+                foreach(string s in text)
                 {
-                    inputs.Add(Double.Parse(args[i].Trim(new Char[] { '[', ',', '\'', ']' })));
+                    if (count == 0)
+                        error = Double.Parse(s);
+
+                    else if (count == 1) 
+                        seed = Double.Parse(s);
+
+                    else 
+                        inputs.Add(Double.Parse(s));
+
+                    count++;
                 }
 
                 var fs_list = ListModule.OfSeq(inputs);
-                double result = NewtonRoot.CNewton(fs_list, seed, error);
 
-                Console.WriteLine(result);
+                new PositiveReply("good", null, null, NewtonRoot.CNewton(fs_list, seed, error)).PrintToConsole();
+
                 return;
             }
             else if(Command == "parse")
