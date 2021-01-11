@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using static LookupTable;
+using static Interpreter.Models.LookupTable;
 
+namespace Interpreter.Models
+{
+
+	//This class executes the expression using a modified version of the Shunting
+	//Yard algorithm by Rudy Lapeer. 
 	public class Executor
 	{
-		readonly LookupTable lt;
+		LookupTable lt;
 		Stack Operators;
 		Stack Numbers;
 		double operand1, operand2;
 		Tokens operatorID;
 
+		//Inits a fresh executor
 		public Executor(ref LookupTable lt)
 		{
 			this.lt = lt;
@@ -20,18 +25,25 @@ using static LookupTable;
 			operatorID = Tokens.EMPTY;
 		}
 
+		/// <summary>
+		/// This function calculates the result of an operation by taking
+		/// two numbers of the numbers stack and an operater of the stack.
+		/// The result of the caclulation is then pushed back into the 
+		/// numbers stack as a running total.
+		/// </summary>
 		public void Calculate()
 		{
-			(string, double) op2 = ("", 0);
+			//operand1 only has a tuple as only an = operation 
+			//requires the left operator to be set
 			(string, double) op1 = ("", 0);
 
 			operatorID = (Tokens)Operators.Pop();
 
+			//This section checks to see if the object in the numbers stack is a string
+			//this will mean it is a variable and sets the op2 variable as as so.
 			if (Numbers.Peek() is string)
 			{
 				string var = (string)Numbers.Pop();
-				op2 = ((string)var, lt.GetVarValue((string)var));
-				//op2IsVar = true;
 				operand2 = lt.GetVarValue((string)var);
 			}
 			else
@@ -50,6 +62,8 @@ using static LookupTable;
 			}
 
 
+			//This section is just a switch case to decide which operation
+			//should be performed to the two operands.
 			double result = 0;
 			switch (operatorID)
 			{
@@ -84,6 +98,12 @@ using static LookupTable;
 			}
 		}
 
+		/// <summary>
+		/// This is the modified Shunting Yard algorithm. First it reads the symbols/tokens
+		/// and pushes them to the correct stack. It will then call calulate on certain operators,
+		/// this follows order of presidence/BIDMAS
+		/// </summary>
+		/// <returns></returns>
 		public double ShuntYard()
 		{
 			int count = 0;
@@ -176,21 +196,22 @@ using static LookupTable;
 						break;
 				}
 			}
+			//This is a fail safe to make sure that all operators are used.
 			while (Operators.Count > 0)
 			{
 				Calculate();
 			}
 
-
+			//This if exists as an assignment of a variable will not return back
+			//to the numbers stack. 
 			if (Numbers.Count == 1)
 			{
 				return Convert.ToDouble(Numbers.Pop());
 			}
 			else
 			{
-			return 0;
+				return 0;
 			}
 		}
-
-
 	}
+}

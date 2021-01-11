@@ -1,214 +1,222 @@
-﻿using System;
+﻿using Interpreter.Models;
+using System;
 using System.Collections;
-using System.Collections.Generic;
-using static LookupTable;
-using static LookupTable.Symbol;
-using static LookupTable.Tokens;
+using static Interpreter.Models.LookupTable;
+using static Interpreter.Models.LookupTable.Tokens;
 
-public class Lexer
+namespace Interpreter.Models
 {
-	string input; //Input parsed through reference
-	LookupTable lt; //Lookup Table parsed thorugh reference
-	int MAX_TOKENS;
 
-	public Lexer(ref string input, ref LookupTable lt)
+	public class Lexer
 	{
-		this.input=input;
-		this.MAX_TOKENS = lt.MAX_TOKENS;
-		this.lt = lt;
-	}
+		readonly string input; //Input parsed through reference
+		readonly LookupTable lt; //Lookup Table parsed thorugh reference
 
-	public (int, string) Process()
-	{
-		int input_length = input.Length;
-		int token_i = 0; //Token Counter
-		for (int i = 0; i < input_length; ++i) //For loop to go through input
+		public Lexer(ref string input, ref LookupTable lt)
 		{
-			if (token_i == MAX_TOKENS) //If token count is the same size as max tokens stop the lexer 
-				break;
+			this.input = input;
+			this.lt = lt;
+		}
 
-			switch (input[i])
+		/// <summary>
+		/// This function processes the string of input given and uses a switch case to make
+		/// the symbol table.
+		/// </summary>
+		/// <returns> A tuple of number of tokens and either true or an error</returns>
+		public (int, string) Process()
+		{
+			int input_length = input.Length;
+			int token_i = 0; //Token Counter
+			for (int i = 0; i < input_length; ++i) //For loop to go through input
 			{
-				case (' '): break; //Used to ignore spaces from the input
+				if (token_i == lt.MAX_TOKENS) //If token count is the same size as max tokens stop the lexer 
+					break;
 
-				case ('='): //Used to assign variable
-					{
-						lt.symbols[token_i++] = new Symbol(Equal, 0);
-						break;
-					}
+				switch (input[i])
+				{
+					case (' '): break; //Used to ignore spaces from the input
 
-				case ('+'): //Used to add the plus to the token array
-					{
-						lt.symbols[token_i++] = new Symbol(Plus, 0);
-						break;
-					}
-
-				case ('-'): //Used to add the minus to the token array
-					{
-						lt.symbols[token_i++] = new Symbol(Minus, 0);
-						break;
-					}
-
-				case ('^'): //Used to add the multiplication to the token array
-					{
-						lt.symbols[token_i++] = new Symbol(Exponent, 0);
-						break;
-					}
-
-				case ('*'): //Used to add the multiplication to the token array
-					{
-						lt.symbols[token_i++] = new Symbol(Multiply, 0);
-						break;
-					}
-
-				case ('/'): //Used to add the division to the token array
-					{
-						lt.symbols[token_i++] = new Symbol(Divide, 0);
-						break;
-					}
-				
-				case ('('): //Used to add the left bracket to the token array
-					{
-						lt.symbols[token_i++] = new Symbol(Left_Para, 0);
-						break;
-					}
-				
-				case (')'): //Used to add the right bracket to the token array
-					{
-						lt.symbols[token_i++] = new Symbol(Right_Para, 0);
-						break;
-					}
-
-				case ('P'): //Used to add Pi to then token array
-					{
-						lt.symbols[token_i++] = new Symbol(LookupTable.Tokens.Double, 3.14159);
-						break;
-					}
-	
-
-				default: //If no symbol above is found
-					{
-						if (!Char.IsLetterOrDigit(input[i]))
+					case ('='): //Used to assign variable
 						{
-							return (0, "Unknown symbol "+ input[i]);
-						}
-						else if (Char.IsLetter(input[i]))
-						{
-							/*
-							 * If the current char is a letter we find out what
-							 * then converting the char to a byte for storage as a token 
-							 */
-							string varName = "";
-							while (Char.IsLetter(input[i]))
-							{
-								varName += input[i++];
-
-								if (i >= input.Length)
-								{
-									break;
-								}
-							}
-							lt.symbols[token_i++] = new Symbol(Tokens.Variable, varName);
-							--i;
+							lt.symbols[token_i++] = new Symbol(Equal, 0);
 							break;
 						}
-						else
+
+					case ('+'): //Used to add the plus to the token array
 						{
-							/*
-							 * This is very similar to the above but just counts out numbers by themselves.
-							 * So the token for number is stored in the token table and the number is stored
-							 * in symbol table.
-							 */
-							 
-							int number_counter = 0;
-							char[] number = new char[input.Length];
-							bool isFloat = false;
-							while (Char.IsDigit(input[i]) || (input[i]=='.'))
+							lt.symbols[token_i++] = new Symbol(Plus, 0);
+							break;
+						}
+
+					case ('-'): //Used to add the minus to the token array
+						{
+							lt.symbols[token_i++] = new Symbol(Minus, 0);
+							break;
+						}
+
+					case ('^'): //Used to add the multiplication to the token array
+						{
+							lt.symbols[token_i++] = new Symbol(Exponent, 0);
+							break;
+						}
+
+					case ('*'): //Used to add the multiplication to the token array
+						{
+							lt.symbols[token_i++] = new Symbol(Multiply, 0);
+							break;
+						}
+
+					case ('/'): //Used to add the division to the token array
+						{
+							lt.symbols[token_i++] = new Symbol(Divide, 0);
+							break;
+						}
+
+					case ('('): //Used to add the left bracket to the token array
+						{
+							lt.symbols[token_i++] = new Symbol(Left_Para, 0);
+							break;
+						}
+
+					case (')'): //Used to add the right bracket to the token array
+						{
+							lt.symbols[token_i++] = new Symbol(Right_Para, 0);
+							break;
+						}
+
+					case ('P'): //Used to add Pi to then token array
+						{
+							lt.symbols[token_i++] = new Symbol(LookupTable.Tokens.Double, 3.14159);
+							break;
+						}
+
+
+					default: //If no symbol above is found
+						{
+							if (!Char.IsLetterOrDigit(input[i]))
 							{
-								if (input[i] == '.')
-									isFloat = true;
-
-								number[number_counter++] = input[i++];
-								
-								if (i >= input.Length)
-								{
-									break;
-								}
-
+								return (0, "Unknown symbol " + input[i]);
 							}
-							if (isFloat)
+							else if (Char.IsLetter(input[i]))
 							{
-								try
+								/*
+								 * If the current char is a letter we find out what
+								 * then converting the char to a byte for storage as a token 
+								 */
+								string varName = "";
+								while (Char.IsLetter(input[i]))
 								{
-									lt.symbols[token_i++] = new Symbol(Tokens.Double, double.Parse(new string(number)));
+									varName += input[i++];
+
+									if (i >= input.Length)
+									{
+										break;
+									}
 								}
-								catch (OverflowException)
-								{
-									return (0, "Number is too big or small to be Double");
-								}
+								lt.symbols[token_i++] = new Symbol(Tokens.Variable, varName);
+								--i;
+								break;
 							}
 							else
 							{
-								try
+								/*
+								 * This is very similar to the above but just counts out numbers by themselves.
+								 * So the token for number is stored in the token table and the number is stored
+								 * in symbol table.
+								 */
+
+								int number_counter = 0;
+								char[] number = new char[input.Length];
+								bool isFloat = false;
+								while (Char.IsDigit(input[i]) || (input[i] == '.'))
 								{
-									lt.symbols[token_i++] = new Symbol(Integer, int.Parse(new string(number)));
+									if (input[i] == '.')
+										isFloat = true;
+
+									number[number_counter++] = input[i++];
+
+									if (i >= input.Length)
+									{
+										break;
+									}
+
 								}
-								catch (OverflowException)
+								if (isFloat)
 								{
-									return (0, "Number is too big or small to be Int32");
+									try
+									{
+										lt.symbols[token_i++] = new Symbol(Tokens.Double, double.Parse(new string(number)));
+									}
+									catch (OverflowException)
+									{
+										return (0, "Number is too big or small to be Double");
+									}
 								}
+								else
+								{
+									try
+									{
+										lt.symbols[token_i++] = new Symbol(Integer, int.Parse(new string(number)));
+									}
+									catch (OverflowException)
+									{
+										return (0, "Number is too big or small to be Int32");
+									}
+								}
+								--i;
+								break;
 							}
-							--i;
-							break;
 						}
-					}
-
-			}
-		}
-		
-
-		
-		int added = 0;
-
-		Symbol[] temp = new Symbol[lt.symbols.Length];
-
-		for (int i = 0; i < (token_i + added); i++)
-		{
-			temp[i + added] = lt.symbols[i];
-
-			if (lt.symbols[i + added].Type is Tokens.Double || lt.symbols[i + added].Type is Integer)
-			{
-				if (lt.symbols[i + added + 1].Type is Tokens.Variable)
-				{
-					temp[i+1 + added] = new Symbol(Multiply, 0);
-					added++;
 				}
-			} 
+			}
+
+			int addedOffset = 0;
+			ArrayList temp = new ArrayList(lt.symbols);
+
+			//This loops over symbols if it finds a factor next to a variable next to
+			//a variable it automatically adds a multiply, allowing for the input of
+			//2k = 2*k.
+			//It also checks if there is a minus sign without a factor infront of it,
+			//at somepoint the program stopped accepting a minus with one factor so this
+			//is a fix meaning that
+			//-5 = 0-5 
+			for (int j = 0; j < (token_i + addedOffset); j++)
+			{
+				if (lt.symbols[j].Type is Tokens.Double || lt.symbols[j].Type is Integer)
+				{
+					if (lt.symbols[j + 1].Type is Tokens.Variable)
+					{
+						temp.Insert(j + 1 + addedOffset, new Symbol(Multiply, 0));
+						addedOffset++;
+					}
+				}
+
+				if (lt.symbols[j].Type is Tokens.Minus)
+				{
+					if (j == 0)
+					{
+						temp.Insert(j, new Symbol(Integer, 0));
+						addedOffset++;
+					}
+					else if (!((lt.symbols[j - 1].Type is Tokens.Double || lt.symbols[j - 1].Type is Integer || lt.symbols[j - 1].Type is Variable)))
+					{
+						temp.Insert(j, new Symbol(Integer, 0));
+						addedOffset++;
+					}
+				}
+			}
+			Array.Copy(temp.ToArray(typeof(Symbol)), 0, lt.symbols, 0, token_i + addedOffset);
+
+			//This fills the rest of the symbol array with EMPTY tokens in order to make sure
+			//no unpredictable data can cause bugs.
+			int fill_array = token_i + addedOffset;
+			while (fill_array < lt.symbols.Length)
+			{
+				lt.symbols[fill_array++] = new Symbol(Tokens.EMPTY, 0.0);
+			}
+
+			return (token_i, "true");
 		}
 
-		lt.symbols = temp;
-		
-		
-		int fill_array = token_i + added;
-		
-		while (fill_array < lt.symbols.Length)
-		{
-			lt.symbols[fill_array++] = new Symbol(Tokens.EMPTY, 0.0);
-		}
-
-		return (token_i, "true");
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
