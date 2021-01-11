@@ -19,8 +19,6 @@ namespace Interpreter
             {
                 dynamic text = JsonConvert.DeserializeObject(args[1]);
 
-                Reply reply;
-
                 double error = 0.0;
                 double seed = 0.0;
                 int count = 0;
@@ -55,7 +53,7 @@ namespace Interpreter
 
                 foreach(string s in text)
                 {
-                    reply = Parse(ref lt, s);
+                    reply = Parse(ref lt, s, true);
 
                     if (reply is ErrorReply)
                     {
@@ -77,7 +75,7 @@ namespace Interpreter
 
                 foreach (string s in text)
                 {
-                    Reply reply = Parse(ref lt, s);
+                    Reply reply = Parse(ref lt, s, false);
 
                     if (reply is ErrorReply)
                     {
@@ -94,18 +92,18 @@ namespace Interpreter
 
                     }
                 }
-                lt.pt.SetWidthFirst();
-                new PositiveReply("good", lt.pt.width_first, lt.variables, final_result).PrintToConsole();
+                lt.pt.SetABST();
+                new PositiveReply("good", lt.pt.ABST, lt.variables, final_result).PrintToConsole();
                 return;
             }
             else
             {
-                Console.WriteLine("Unknown commands");
+                new ErrorReply("bad", "Interpreter error", "Unknown command", Command).PrintToConsole();
             }
         }
         
 
-        public static Reply Parse(ref LookupTable lt, string s)
+        public static Reply Parse(ref LookupTable lt, string s, bool isFromParseFunc)
         {
             Lexer lex = new Lexer(ref s, ref lt);
             (int, string) lexResult = lex.Process();
@@ -113,7 +111,7 @@ namespace Interpreter
             if (lexResult.Item1 > 0)
             {
 
-                Parser parser = new Parser(ref lt);
+                Parser parser = new Parser(ref lt, isFromParseFunc);
                 string parseResult = parser.Parse();
                 if (parseResult == "p")
                 {
@@ -135,7 +133,7 @@ namespace Interpreter
             }
             else
             {
-                return new ErrorReply("bad", "Parser Error", lexResult.Item2, s);
+                return new ErrorReply("bad", "Lexer Error", lexResult.Item2, s);
             }
         }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using static ParsedTrie;
 
 namespace Interpreter.Models
 {
@@ -20,14 +21,14 @@ namespace Interpreter.Models
     {
 
         public string status;
-        public List<List<string>> AST;
+        public ParsedTrieNode ABST;
         public Dictionary<string, object> variables;
         public double output;
 
-        public PositiveReply(string status, List<List<string>> AST, Dictionary<string, object> variables, double output)
+        public PositiveReply(string status, ParsedTrieNode ABST, Dictionary<string, object> variables, double output)
         {
             this.status = status;
-            this.AST = AST;
+            this.ABST = ABST;
             this.variables = variables;
             this.output = output;
         }

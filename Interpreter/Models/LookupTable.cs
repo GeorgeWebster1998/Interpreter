@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 public class LookupTable
@@ -17,11 +18,15 @@ public class LookupTable
 		Right_Para = 8,
 		Integer = 9,
 		Double = 10,
-		Variable = 11
+		Variable = 11,
+		Pi = 12,
+		Tan = 13 
+
 	}
 
 	public Symbol[] symbols;
 	public Dictionary<String, object> variables;
+	//public const 
 	public ParsedTrie pt;
 	public int MAX_TOKENS;
 

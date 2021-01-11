@@ -8,14 +8,16 @@ public class Parser
 	string ret;
 	LookupTable lt;
 	ParsedTrie trie;
+	bool isFromParseFunc;
 
-	public Parser(ref LookupTable lt)
+	public Parser(ref LookupTable lt, bool isFromParseFunc)
 	{
 		this.LookAhead = -1;
 		this.currentToken = 0;
 		this.ret = "p";
 		this.lt = lt;
-		trie = new ParsedTrie();
+		this.trie = new ParsedTrie();
+		this.isFromParseFunc = isFromParseFunc;
 	}
 
 	/*	BNF
@@ -214,21 +216,25 @@ public class Parser
 				Advance_LookAhead();
 				return true;
 			}
+			else if (this.isFromParseFunc)
+			{
+				string varname = (string)lt.GetSymbol(currentToken).Value;
+				lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, 0);
+				return true;
+			}
+			else if (lt.VariableExist((string)lt.GetSymbol(currentToken).Value))
+			{
+				string varName = (string)lt.GetSymbol(currentToken).Value;
+				trie.AddNewNode(level+1, "<<Factor>>", (string)varName + " -> " + lt.GetVarValue(varName));
+				Advance_LookAhead();
+				return true;
+			}	
 			else
 			{
-				if (lt.VariableExist((string)lt.GetSymbol(currentToken).Value))
-				{
-					string varName = (string)lt.GetSymbol(currentToken).Value;
-					trie.AddNewNode(level+1, "<<Factor>>", (string)varName + " -> " + lt.GetVarValue(varName));
-					Advance_LookAhead();
-					return true;
-				}
-				else
-				{
-					ret = "Variable " + lt.GetSymbol(currentToken).Value + " not initialised";
-				}
-				Advance_LookAhead();
+				ret = "Variable " + lt.GetSymbol(currentToken).Value + " not initialised";
 			}
+			Advance_LookAhead();
+		
 		}
 		return false;
 	}

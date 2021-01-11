@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using static LookupTable;
 using static LookupTable.Symbol;
 
@@ -9,13 +10,13 @@ public class ParsedTrie
 	ParsedTrieNode root;
 	public int deepest_node;
 	public double final_result;
-	public List<List<string>> width_first;
+	public ParsedTrieNode ABST;
 
 	public ParsedTrie()
 	{
 		root = new ParsedTrieNode(0, Tokens.EMPTY, null);
 		final_result = 0;
-		width_first = new List<List<string>>();
+		ABST = new ParsedTrieNode(0, Tokens.EMPTY, null);
 	}
 
 	public void AddNewNode(int depth, Object parentValue, Object value)
@@ -52,12 +53,12 @@ public class ParsedTrie
 		}
 	}
 
-	public void SetWidthFirst()
+	public void SetABST()
 	{
-		List<List<string>> list = new List<List<string>>();
+		List<List<ParsedTrieNode>> list = new List<List<ParsedTrieNode>>();
 		for (int i = 0; i <= deepest_node; i++)
 		{
-			list.Add(new List<string>());
+			list.Add(new List<ParsedTrieNode>());
 		}
 
 		ArrayList toVisit = new ArrayList(root.Children);
@@ -67,7 +68,11 @@ public class ParsedTrie
 		{
 			ParsedTrieNode node = (ParsedTrieNode)toVisit[0];
 
-			list[node.Depth].Add(node.ToString());
+			if (!(node.ToString().Contains("<<")))
+			{
+				list[node.Depth].Add(node);
+			}
+			
 			if (node.IsLeaf() == false)
 			{
 				foreach (ParsedTrieNode toAdd in node.Children)
@@ -80,8 +85,42 @@ public class ParsedTrie
 			Visited.Add(node);
 		}
 
-		this.width_first = list;
+		int emptyCount = 0;
+		int depth = 0;
+		ParsedTrie newTrie = new ParsedTrie();
+		ParsedTrieNode lastItem = newTrie.root;
+		ArrayList Operators = new ArrayList{ Tokens.Plus, Tokens.Minus, Tokens.Multiply, Tokens.Divide, Tokens.Exponent, Tokens.Equal };
 
+		for (int j = 0; j < list.Count; j++)
+		{
+			if (list[j].Count == 0)
+			{
+				emptyCount++;
+			}
+
+			for (int k=0; k < list[j].Count; k++)
+			{
+				if (emptyCount > 0)
+				{
+					depth = (j+1) - emptyCount;
+					emptyCount = 0;
+				}
+
+				ParsedTrieNode toAdd = new ParsedTrieNode(depth, lastItem, list[j][k].Value);
+
+				lastItem.AddChild(toAdd);
+
+				if (Operators.Contains(list[j][k].Value))
+				{
+					lastItem = toAdd;
+				}
+
+				depth++;
+			}
+
+		}
+
+		ABST = newTrie.root;
 	}
 
 	public void PrintWidthFirst()
@@ -204,6 +243,12 @@ public class ParsedTrie
 			}
 			return null;
 		}
+
+		public void AddChild(ParsedTrieNode node)
+		{
+			this.Children.Add(node);
+		}
+
 
 		/*
 		public bool RemoveChild(Object value)

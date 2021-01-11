@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using static LookupTable;
 using static LookupTable.Symbol;
 using static LookupTable.Tokens;
@@ -76,6 +78,12 @@ public class Lexer
 						lt.symbols[token_i++] = new Symbol(Right_Para, 0);
 						break;
 					}
+
+				case ('P'): //Used to add Pi to then token array
+					{
+						lt.symbols[token_i++] = new Symbol(LookupTable.Tokens.Double, 3.14159);
+						break;
+					}
 	
 
 				default: //If no symbol above is found
@@ -87,9 +95,8 @@ public class Lexer
 						else if (Char.IsLetter(input[i]))
 						{
 							/*
-							 * If the current char is a letter we find out what the following number is
-							 * then converting the char to a byte for storage as a token and storing the 
-							 * number in the symbol table
+							 * If the current char is a letter we find out what
+							 * then converting the char to a byte for storage as a token 
 							 */
 							string varName = "";
 							while (Char.IsLetter(input[i]))
@@ -157,9 +164,33 @@ public class Lexer
 					}
 
 			}
-
 		}
-		int fill_array = token_i;
+		
+
+		
+		int added = 0;
+
+		Symbol[] temp = new Symbol[lt.symbols.Length];
+
+		for (int i = 0; i < (token_i + added); i++)
+		{
+			temp[i + added] = lt.symbols[i];
+
+			if (lt.symbols[i + added].Type is Tokens.Double || lt.symbols[i + added].Type is Integer)
+			{
+				if (lt.symbols[i + added + 1].Type is Tokens.Variable)
+				{
+					temp[i+1 + added] = new Symbol(Multiply, 0);
+					added++;
+				}
+			} 
+		}
+
+		lt.symbols = temp;
+		
+		
+		int fill_array = token_i + added;
+		
 		while (fill_array < lt.symbols.Length)
 		{
 			lt.symbols[fill_array++] = new Symbol(Tokens.EMPTY, 0.0);
