@@ -112,8 +112,7 @@ namespace Interpreter.Models
 				switch (lt.GetSymbol(count).Type)
 				{
 					case Tokens.Integer:
-						//Numbers.Push(lt.GetSymbol(count++).Value);
-						Numbers.Push(Double.MaxValue);
+						Numbers.Push(lt.GetSymbol(count++).Value);
 						break;
 
 					case Tokens.Double:
