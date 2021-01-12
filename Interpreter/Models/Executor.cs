@@ -60,8 +60,7 @@ namespace Interpreter.Models
 			{
 				operand1 = Convert.ToDouble(Numbers.Pop());
 			}
-
-
+			
 			//This section is just a switch case to decide which operation
 			//should be performed to the two operands.
 			double result = 0;
@@ -113,7 +112,8 @@ namespace Interpreter.Models
 				switch (lt.GetSymbol(count).Type)
 				{
 					case Tokens.Integer:
-						Numbers.Push(lt.GetSymbol(count++).Value);
+						//Numbers.Push(lt.GetSymbol(count++).Value);
+						Numbers.Push(Double.MaxValue);
 						break;
 
 					case Tokens.Double:

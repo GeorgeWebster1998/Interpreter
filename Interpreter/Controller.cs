@@ -91,7 +91,17 @@ namespace Interpreter
                     {
                         //Init the executor and get the result of parsed tokens
                         //then resets the symbol table for the next expression/statement
-                        double result = new Executor(ref lt).ShuntYard();
+                        double result = 0.0;
+                        try
+                        {
+                            result = new Executor(ref lt).ShuntYard();
+                        }
+                        catch (Exception)
+                        {
+                            new ErrorReply("bad", "Executor error", "Overflow Exception", s).PrintToConsole();
+                            return;
+                        }
+
                         lt.InitSymbols(config.MAX_TOKENS);
 
                         //This is used for output
