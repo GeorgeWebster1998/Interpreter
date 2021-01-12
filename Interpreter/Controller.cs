@@ -8,7 +8,7 @@ namespace Interpreter
 {
     public class Controller
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Config config = new Config();
             LookupTable lt = new LookupTable(config.MAX_TOKENS); // Class to store Tokens and Symbols
