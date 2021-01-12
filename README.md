@@ -13,4 +13,4 @@ Needs to be ran using command line arguements for each different use:
 
 If an error occurs from any of the expressions/statements it will return a error early. Otherwise parse will return one true for all statements/expressions. Expression will also only return the result from the final expression/statement. All outputs are written to console and are serialized as json.
 
-The Interpreter itself can handle doubles, integers, variables, addition, subtraction, mutiplication, division and exponenets.
+The Interpreter itself can handle doubles, integers, variables, addition, subtraction, mutiplication, division and exponents.
