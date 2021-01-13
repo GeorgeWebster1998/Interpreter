@@ -22,7 +22,7 @@ namespace Interpreter.Models
             this.ErrorMargin = 0.0001;
             this.Seed = 0;
 
-            //SetSettings();
+            SetSettings();
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Interpreter.Models
             // of the init and will override or write a new deafult json file.
             catch (Exception)
             {
-                //File.WriteAllText("config.json", JsonConvert.SerializeObject(this));
+                File.WriteAllText("config.json", JsonConvert.SerializeObject(this));
             }
         }
     }

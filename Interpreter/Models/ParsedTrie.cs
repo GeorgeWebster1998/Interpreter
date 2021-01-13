@@ -110,13 +110,28 @@ namespace Interpreter.Models
 						emptyCount = 0;
 					}
 
-					ParsedTrieNode toAdd = new ParsedTrieNode(depth, lastItem, list[j][k].Value);
+					ParsedTrieNode toAdd;
 
-					lastItem.AddChild(toAdd);
+
+					if (list[j][k].Value is Tokens)
+					{
+						toAdd = new ParsedTrieNode(depth, lastItem, ((Tokens) list[j][k].Value).ToString());
+						lastItem.AddChild(toAdd);
+
+					}
+					else
+					{
+						toAdd = new ParsedTrieNode(depth, lastItem, list[j][k].Value);
+						lastItem.AddChild(toAdd);
+					}
+
+
+					
 
 					if (Operators.Contains(list[j][k].Value))
 					{
 						lastItem = toAdd;
+						lastItem.AddChild(toAdd);
 					}
 
 					depth++;
