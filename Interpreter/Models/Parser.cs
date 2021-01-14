@@ -219,7 +219,7 @@ namespace Interpreter.Models
 				else ret = "Missing closing bracket";
 				return;
 			}
-			else ret = "Missing factor";
+			//else ret = "Missing factor";
 			return;
 		}
 
