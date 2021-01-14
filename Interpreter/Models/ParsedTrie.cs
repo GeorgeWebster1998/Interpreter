@@ -67,6 +67,7 @@ namespace Interpreter.Models
 
 			ArrayList toVisit = new ArrayList(root.Children);
 			ArrayList Visited = new ArrayList();
+			ArrayList addList = new ArrayList();
 
 			while (toVisit.Count != 0)
 			{
@@ -82,11 +83,13 @@ namespace Interpreter.Models
 					foreach (ParsedTrieNode toAdd in node.Children)
 					{
 						if (!Visited.Contains(toAdd))
-							toVisit.Add(toAdd);
+							addList.Add(toAdd);
 					}
 				}
+				toVisit.InsertRange(0, addList);
 				toVisit.Remove(node);
 				Visited.Add(node);
+				addList.Clear();
 			}
 
 			int emptyCount = 0;
@@ -124,9 +127,6 @@ namespace Interpreter.Models
 						toAdd = new ParsedTrieNode(depth, lastItem, list[j][k].Value);
 						lastItem.AddChild(toAdd);
 					}
-
-
-					
 
 					if (Operators.Contains(list[j][k].Value))
 					{
