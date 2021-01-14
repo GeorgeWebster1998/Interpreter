@@ -198,7 +198,7 @@ namespace Interpreter.Models
 						temp.Insert(j, new Symbol(Integer, 0));
 						addedOffset++;
 					}
-					else if (!((lt.symbols[j - 1].Type is Tokens.Double || lt.symbols[j - 1].Type is Integer || lt.symbols[j - 1].Type is Variable)))
+					else if (!((lt.symbols[j - 1].Type is Tokens.Double || lt.symbols[j - 1].Type is Integer || lt.symbols[j - 1].Type is Variable || lt.symbols[j-1].Type is Right_Para)))
 					{
 						temp.Insert(j, new Symbol(Integer, 0));
 						addedOffset++;
