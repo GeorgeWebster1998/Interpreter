@@ -57,6 +57,7 @@ namespace Interpreter.Models
 
 		//This function converts a width first search of the parse trie into a list,
 		//that only consists of factors and operators and converts it back into a trie
+		/*
 		public void SetABST()
 		{
 			List<List<ParsedTrieNode>> list = new List<List<ParsedTrieNode>>();
@@ -140,6 +141,47 @@ namespace Interpreter.Models
 			}
 
 			ABST = newTrie.root;
+		}
+		*/
+
+		public void SetABST()
+		{
+			ABST = new ParsedTrieNode(-1, Tokens.EMPTY, null);
+
+			ArrayList toVisit = new ArrayList();
+			toVisit.Add(root);
+			ArrayList Visited = new ArrayList();
+			ArrayList Operators = new ArrayList { Tokens.Plus, Tokens.Minus, Tokens.Multiply, Tokens.Divide, Tokens.Exponent, Tokens.Equal };
+			ParsedTrieNode lastOp = ABST;
+
+
+			while (toVisit.Count != 0)
+			{
+				ParsedTrieNode node = (ParsedTrieNode)toVisit[0];
+
+				if (Operators.Contains(node.Value))
+				{
+					lastOp.Children.Add(node);
+					lastOp = node;
+					
+				}
+				else if (!(node.Value is null) && !(node.ToString().Contains("<<")))
+				{
+					lastOp.Children.Add(node);
+				}
+
+				if (node.IsLeaf() == false)
+				{
+					foreach (ParsedTrieNode toAdd in node.Children)
+					{
+						if (!Visited.Contains(toAdd))
+							toVisit.Add(toAdd);
+					}
+				}
+				toVisit.Remove(node);
+				Visited.Add(node);
+			}
+
 		}
 
 		//This function prints the trie width first
@@ -238,6 +280,10 @@ namespace Interpreter.Models
 					ret += "-";
 				}
 				*/
+				if(this.Value == null)
+				{
+					return "\"<<\"";
+				}
 
 				return this.Value.ToString();
 			}
