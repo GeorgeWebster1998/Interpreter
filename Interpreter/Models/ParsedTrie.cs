@@ -21,7 +21,7 @@ namespace Interpreter.Models
 		}
 
 		//This function adds new nodes to the trie using their depth and parent value
-		public void AddNewNode(int depth, Object parentValue, Object value)
+		public void AddNewNode(int depth, object parentValue, object value)
 		{
 			if (root.IsLeaf()) { root.Children.Add(new ParsedTrieNode(depth, parentValue, value)); return; }
 
@@ -54,95 +54,6 @@ namespace Interpreter.Models
 				}
 			}
 		}
-
-		//This function converts a width first search of the parse trie into a list,
-		//that only consists of factors and operators and converts it back into a trie
-		/*
-		public void SetABST()
-		{
-			List<List<ParsedTrieNode>> list = new List<List<ParsedTrieNode>>();
-			for (int i = 0; i <= deepest_node; i++)
-			{
-				list.Add(new List<ParsedTrieNode>());
-			}
-
-			ArrayList toVisit = new ArrayList(root.Children);
-			ArrayList Visited = new ArrayList();
-			ArrayList addList = new ArrayList();
-
-			while (toVisit.Count != 0)
-			{
-				ParsedTrieNode node = (ParsedTrieNode)toVisit[0];
-
-				if (!(node.ToString().Contains("<<")))
-				{
-					list[node.Depth].Add(node);
-				}
-
-				if (node.IsLeaf() == false)
-				{
-					foreach (ParsedTrieNode toAdd in node.Children)
-					{
-						if (!Visited.Contains(toAdd))
-							addList.Add(toAdd);
-					}
-				}
-				toVisit.InsertRange(0, addList);
-				toVisit.Remove(node);
-				Visited.Add(node);
-				addList.Clear();
-			}
-
-			int emptyCount = 0;
-			int depth = 0;
-			ParsedTrie newTrie = new ParsedTrie();
-			ParsedTrieNode lastItem = newTrie.root;
-			ArrayList Operators = new ArrayList { Tokens.Plus, Tokens.Minus, Tokens.Multiply, Tokens.Divide, Tokens.Exponent, Tokens.Equal };
-
-			for (int j = 0; j < list.Count; j++)
-			{
-				if (list[j].Count == 0)
-				{
-					emptyCount++;
-				}
-
-				for (int k = 0; k < list[j].Count; k++)
-				{
-					if (emptyCount > 0)
-					{
-						depth = (j + 1) - emptyCount;
-						emptyCount = 0;
-					}
-
-					ParsedTrieNode toAdd;
-
-
-					if (list[j][k].Value is Tokens)
-					{
-						toAdd = new ParsedTrieNode(depth, lastItem, ((Tokens) list[j][k].Value).ToString());
-						lastItem.AddChild(toAdd);
-
-					}
-					else
-					{
-						toAdd = new ParsedTrieNode(depth, lastItem, list[j][k].Value);
-						lastItem.AddChild(toAdd);
-					}
-
-					if (Operators.Contains(list[j][k].Value))
-					{
-						lastItem = toAdd;
-						lastItem.AddChild(toAdd);
-					}
-
-					depth++;
-				}
-
-			}
-
-			ABST = newTrie.root;
-		}
-		*/
 
 		public void SetABST()
 		{
@@ -273,14 +184,7 @@ namespace Interpreter.Models
 
 			public override string ToString()
 			{
-				/*
-				string ret = "";
-				for (int i = Depth; i > 0; i--)
-				{
-					ret += "-";
-				}
-				*/
-				if(this.Value == null)
+				if (this.Value == null)
 				{
 					return "\"<<\"";
 				}

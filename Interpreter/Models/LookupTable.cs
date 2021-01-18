@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections.Generic;
 
 namespace Interpreter.Models
@@ -7,6 +9,7 @@ namespace Interpreter.Models
 	public class LookupTable
 	{
 		//These are the tokens that are used to classify each symbol
+		[JsonConverter(typeof(StringEnumConverter))]
 		public enum Tokens : int
 		{
 			EMPTY = -1,
