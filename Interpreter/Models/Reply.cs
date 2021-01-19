@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using static Interpreter.Models.ParsedTrie;
+using static Interpreter.Models.ParseTree;
 
 namespace Interpreter.Models
 {
@@ -9,6 +9,7 @@ namespace Interpreter.Models
     //the print to console function.
     public abstract class Reply
     {
+        public string status;
         public void PrintToConsole()
         {
             Console.WriteLine(JsonConvert.SerializeObject(this, new JsonSerializerSettings
@@ -26,15 +27,14 @@ namespace Interpreter.Models
     //output: will be the result of the last expression/statement
     public class PositiveReply : Reply
     {
-        public string status;
-        public ParsedTrieNode ABST;
+        public ParsedTreeNode AST;
         public Dictionary<string, object> variables;
         public double output;
 
-        public PositiveReply(string status, ParsedTrieNode ABST, Dictionary<string, object> variables, double output)
+        public PositiveReply(ParsedTreeNode AST, Dictionary<string, object> variables, double output)
         {
-            this.status = status;
-            this.ABST = ABST;
+            this.status = "good";
+            this.AST = AST;
             this.variables = variables;
             this.output = output;
         }
@@ -47,14 +47,13 @@ namespace Interpreter.Models
     //location: is what expression/statement it happened on
     public class ErrorReply : Reply
     {
-        public string status;
         public string type;
         public string error;
         public string location;
 
-        public ErrorReply(string status, string type, string error, string location)
+        public ErrorReply(string type, string error, string location)
         {
-            this.status = status;
+            this.status = "bad";
             this.type = type;
             this.error = error;
             this.location = location;

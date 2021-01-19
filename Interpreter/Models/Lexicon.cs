@@ -7,12 +7,12 @@ using static Interpreter.Models.LookupTable.Tokens;
 namespace Interpreter.Models
 {
 
-	public class Lexer
+	public class Lexicon
 	{
 		readonly string input; //Input parsed through reference
 		readonly LookupTable lt; //Lookup Table parsed thorugh reference
 
-		public Lexer(ref string input, ref LookupTable lt)
+		public Lexicon(ref string input, ref LookupTable lt)
 		{
 			this.input = input;
 			this.lt = lt;

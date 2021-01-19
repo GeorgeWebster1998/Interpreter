@@ -22,7 +22,7 @@ namespace Interpreter.Models
 		int currentToken;
 		string ret;
 		readonly LookupTable lt;
-		readonly ParsedTrie trie;
+		readonly ParseTree trie;
 		readonly bool isFromParseFunc;
 
 		public Parser(ref LookupTable lt, bool isFromParseFunc)
@@ -31,7 +31,7 @@ namespace Interpreter.Models
 			this.currentToken = 0;
 			this.ret = "p";
 			this.lt = lt;
-			this.trie = new ParsedTrie();
+			this.trie = new ParseTree();
 			this.isFromParseFunc = isFromParseFunc;
 		}
 

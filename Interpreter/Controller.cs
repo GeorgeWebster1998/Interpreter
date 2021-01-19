@@ -36,7 +36,7 @@ namespace Interpreter
                 var fs_list = ListModule.OfSeq(inputs);
 
                 //This calls and replys back the result from the f# method
-                new PositiveReply("good", null, null, NewtonRoot.CNewton(fs_list, seed, error)).PrintToConsole();
+                new PositiveReply(null, null, NewtonRoot.CNewton(fs_list, seed, error)).PrintToConsole();
 
                 return;
             }
@@ -98,7 +98,7 @@ namespace Interpreter
                         }
                         catch (Exception)
                         {
-                            new ErrorReply("bad", "Executor error", "Overflow Exception", s).PrintToConsole();
+                            new ErrorReply("Executor error", "Overflow Exception", s).PrintToConsole();
                             return;
                         }
 
@@ -110,13 +110,13 @@ namespace Interpreter
                 }
                 //This sets the abst for output and then sends the reply
                 lt.pt.SetABST();
-                new PositiveReply("good", lt.pt.ABST, lt.variables, final_result).PrintToConsole();
+                new PositiveReply(lt.pt.ABST, lt.variables, final_result).PrintToConsole();
                 return;
             }
             //if the command variable is not recognised it will throw this error
             else
             {
-                new ErrorReply("bad", "Interpreter error", "Unknown command", Command).PrintToConsole();
+                new ErrorReply("Interpreter error", "Unknown command", Command).PrintToConsole();
             }
         }
 
@@ -130,7 +130,7 @@ namespace Interpreter
         public static Reply Parse(ref LookupTable lt, string s, bool isFromParseFunc)
         {
             //This inits the lexer and processes it
-            Lexer lex = new Lexer(ref s, ref lt);
+            Lexicon lex = new Lexicon(ref s, ref lt);
             (int, string) lexResult = lex.Process();
 
             //If the lexer recognises more than one token it will parse the tokens
@@ -157,20 +157,20 @@ namespace Interpreter
                                 variables.Add((string)sym.Value, null);
                             }
                         }
-                        return new PositiveReply("good", null, variables, 0);
+                        return new PositiveReply( null, variables, 0);
                     }
-                    return new PositiveReply("good", null, null, 0);
+                    return new PositiveReply( null, null, 0);
                 }
                 //If the parser encounters an error
                 else
                 {
-                    return new ErrorReply("bad", "Parser Error", parseResult, s);
+                    return new ErrorReply("Parser Error", parseResult, s);
                 }
             }
             //If the lexer doesn't recognise any tokens it will throw this error
             else
             {
-                return new ErrorReply("bad", "Lexer Error", lexResult.Item2, s);
+                return new ErrorReply("Lexer Error", lexResult.Item2, s);
             }
         }
     }

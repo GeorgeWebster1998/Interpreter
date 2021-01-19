@@ -143,7 +143,7 @@ namespace Interpreter.Models
 						Operators.Push(lt.GetSymbol(count++).Type);
 						break;
 
-					case LookupTable.Tokens.Exponent:
+					case LookupTable.Tokens.Multiply:
 						while (Operators.Count > 0 && (Tokens)Operators.Peek() != Tokens.Left_Para
 							&& (Tokens)Operators.Peek() != Tokens.Plus && (Tokens)Operators.Peek() != Tokens.Minus
 							&& (Tokens)Operators.Peek() != Tokens.Equal)
@@ -153,27 +153,27 @@ namespace Interpreter.Models
 						Operators.Push(lt.GetSymbol(count++).Type);
 						break;
 
-
-					case LookupTable.Tokens.Multiply:
-						while (Operators.Count > 0 && (Tokens)Operators.Peek() != Tokens.Left_Para
-							&& (Tokens)Operators.Peek() != Tokens.Plus && (Tokens)Operators.Peek() != Tokens.Minus
-							&& (Tokens)Operators.Peek() != Tokens.Equal && (Tokens)Operators.Peek() != Tokens.Exponent)
-						{
-							Calculate();
-						}
-						Operators.Push(lt.GetSymbol(count++).Type);
-						break;
-
 					case LookupTable.Tokens.Divide:
 						while (Operators.Count > 0 && (Tokens)Operators.Peek() != Tokens.Left_Para
 							&& (Tokens)Operators.Peek() != Tokens.Plus && (Tokens)Operators.Peek() != Tokens.Minus
-							&& (Tokens)Operators.Peek() != Tokens.Equal && (Tokens)Operators.Peek() != Tokens.Exponent)
+							&& (Tokens)Operators.Peek() != Tokens.Equal )
 						{
 							Calculate();
 						}
 						Operators.Push(lt.GetSymbol(count++).Type);
 						break;
 
+					case LookupTable.Tokens.Exponent:
+							while (Operators.Count > 0 && (Tokens)Operators.Peek() != Tokens.Left_Para
+							&& (Tokens)Operators.Peek() != Tokens.Plus && (Tokens)Operators.Peek() != Tokens.Minus
+							&& (Tokens)Operators.Peek() != Tokens.Equal && (Tokens)Operators.Peek() != Tokens.Multiply 
+							&& (Tokens)Operators.Peek() != Tokens.Divide)
+						{
+							Calculate();
+						}
+						Operators.Push(lt.GetSymbol(count++).Type);
+						break;
+					
 					case LookupTable.Tokens.Left_Para:
 						Operators.Push(lt.GetSymbol(count++).Type);
 						break;

@@ -6,33 +6,33 @@ using static Interpreter.Models.LookupTable;
 namespace Interpreter.Models
 {
 	//This is the Trie class
-	public class ParsedTrie
+	public class ParseTree
 	{
-		ParsedTrieNode root;
+		ParsedTreeNode root;
 		public int deepest_node;
 		public double final_result;
-		public ParsedTrieNode ABST;
+		public ParsedTreeNode ABST;
 
-		public ParsedTrie()
+		public ParseTree()
 		{
-			root = new ParsedTrieNode(0, Tokens.EMPTY, null);
+			root = new ParsedTreeNode(0, Tokens.EMPTY, null);
 			final_result = 0;
-			ABST = new ParsedTrieNode(0, Tokens.EMPTY, null);
+			ABST = new ParsedTreeNode(0, Tokens.EMPTY, null);
 		}
 
 		//This function adds new nodes to the trie using their depth and parent value
 		public void AddNewNode(int depth, object parentValue, object value)
 		{
-			if (root.IsLeaf()) { root.Children.Add(new ParsedTrieNode(depth, parentValue, value)); return; }
+			if (root.IsLeaf()) { root.Children.Add(new ParsedTreeNode(depth, parentValue, value)); return; }
 
 			ArrayList toVisit = new ArrayList(root.Children);
 			ArrayList Visited = new ArrayList();
 			while (toVisit.Count != 0)
 			{
-				ParsedTrieNode node = (ParsedTrieNode)toVisit[0];
+				ParsedTreeNode node = (ParsedTreeNode)toVisit[0];
 				if (node.Value == parentValue && node.Depth == depth - 1)
 				{
-					node.Children.Add(new ParsedTrieNode(depth, parentValue, value));
+					node.Children.Add(new ParsedTreeNode(depth, parentValue, value));
 					if (depth > deepest_node)
 					{
 						deepest_node = depth;
@@ -43,7 +43,7 @@ namespace Interpreter.Models
 				{
 					if (node.IsLeaf() == false)
 					{
-						foreach (ParsedTrieNode toAdd in node.Children)
+						foreach (ParsedTreeNode toAdd in node.Children)
 						{
 							if (!Visited.Contains(toAdd))
 								toVisit.Insert(0, toAdd);
@@ -57,18 +57,17 @@ namespace Interpreter.Models
 
 		public void SetABST()
 		{
-			ABST = new ParsedTrieNode(-1, Tokens.EMPTY, null);
+			ABST = new ParsedTreeNode(-1, Tokens.EMPTY, null);
 
-			ArrayList toVisit = new ArrayList();
-			toVisit.Add(root);
+			ArrayList toVisit = new ArrayList{root};
 			ArrayList Visited = new ArrayList();
 			ArrayList Operators = new ArrayList { Tokens.Plus, Tokens.Minus, Tokens.Multiply, Tokens.Divide, Tokens.Exponent, Tokens.Equal };
-			ParsedTrieNode lastOp = ABST;
+			ParsedTreeNode lastOp = ABST;
 
 
 			while (toVisit.Count != 0)
 			{
-				ParsedTrieNode node = (ParsedTrieNode)toVisit[0];
+				ParsedTreeNode node = (ParsedTreeNode)toVisit[0];
 
 				if (Operators.Contains(node.Value))
 				{
@@ -83,7 +82,7 @@ namespace Interpreter.Models
 
 				if (node.IsLeaf() == false)
 				{
-					foreach (ParsedTrieNode toAdd in node.Children)
+					foreach (ParsedTreeNode toAdd in node.Children)
 					{
 						if (!Visited.Contains(toAdd))
 							toVisit.Add(toAdd);
@@ -105,11 +104,11 @@ namespace Interpreter.Models
 
 			while (toVisit.Count != 0)
 			{
-				ParsedTrieNode node = (ParsedTrieNode)toVisit[0];
+				ParsedTreeNode node = (ParsedTreeNode)toVisit[0];
 				Console.WriteLine(node);
 				if (node.IsLeaf() == false)
 				{
-					foreach (ParsedTrieNode toAdd in node.Children)
+					foreach (ParsedTreeNode toAdd in node.Children)
 					{
 						if (!Visited.Contains(toAdd))
 							toVisit.Add(toAdd);
@@ -133,11 +132,11 @@ namespace Interpreter.Models
 
 			while (toVisit.Count != 0)
 			{
-				ParsedTrieNode node = (ParsedTrieNode)toVisit[0];
+				ParsedTreeNode node = (ParsedTreeNode)toVisit[0];
 				Console.WriteLine(node);
 				if (node.IsLeaf() == false)
 				{
-					foreach (ParsedTrieNode toAdd in node.Children)
+					foreach (ParsedTreeNode toAdd in node.Children)
 					{
 						if (!Visited.Contains(toAdd))
 							AddList.Add(toAdd);
@@ -153,15 +152,15 @@ namespace Interpreter.Models
 
 		}
 
-		//This class is used for nodes on the trie
-		public class ParsedTrieNode
+		//This class is used for nodes on the tree
+		public class ParsedTreeNode
 		{
 			public int Depth { get; set; }
 			public Object Parent { get; set; }
 			public Object Value { get; set; }
 			public ArrayList Children { get; set; }
 
-			public ParsedTrieNode(int depth, Object parent, Object value)
+			public ParsedTreeNode(int depth, Object parent, Object value)
 			{
 				this.Depth = depth;
 				this.Parent = parent;
@@ -177,7 +176,7 @@ namespace Interpreter.Models
 
 
 			//This funciton is used to add children to a given node
-			public void AddChild(ParsedTrieNode node)
+			public void AddChild(ParsedTreeNode node)
 			{
 				this.Children.Add(node);
 			}
