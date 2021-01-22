@@ -74,13 +74,13 @@ namespace Interpreter.Models
 
 					case ('('): //Used to add the left bracket to the token array
 						{
-							lt.symbols[token_i++] = new Symbol(Left_Para, 0);
+							lt.symbols[token_i++] = new Symbol(Left_Parenthesis, 0);
 							break;
 						}
 
 					case (')'): //Used to add the right bracket to the token array
 						{
-							lt.symbols[token_i++] = new Symbol(Right_Para, 0);
+							lt.symbols[token_i++] = new Symbol(Right_Parenthesis, 0);
 							break;
 						}
 
@@ -141,7 +141,19 @@ namespace Interpreter.Models
 									}
 
 								}
-								if (isFloat)
+								
+								try
+								{
+									if (isFloat)
+									{
+										lt.symbols[token_i++] = new Symbol(Tokens.Double, double.Parse(new string(number)));
+									}
+									else
+									{
+										lt.symbols[token_i++] = new Symbol(Integer, int.Parse(new string(number)));
+									}
+								}
+								catch (Exception)
 								{
 									try
 									{
@@ -151,24 +163,16 @@ namespace Interpreter.Models
 									{
 										return (0, "Number is too big or small to be Double");
 									}
+
 								}
-								else
-								{
-									try
-									{
-										lt.symbols[token_i++] = new Symbol(Integer, int.Parse(new string(number)));
-									}
-									catch (OverflowException)
-									{
-										return (0, "Number is too big or small to be Int32");
-									}
-								}
-								--i;
-								break;
+
+								
+							}
+							--i;
+							break;
 							}
 						}
 				}
-			}
 
 			int addedOffset = 0;
 			ArrayList temp = new ArrayList(lt.symbols);
@@ -198,7 +202,7 @@ namespace Interpreter.Models
 						temp.Insert(j, new Symbol(Integer, 0));
 						addedOffset++;
 					}
-					else if (!((lt.symbols[j - 1].Type is Tokens.Double || lt.symbols[j - 1].Type is Integer || lt.symbols[j - 1].Type is Variable || lt.symbols[j-1].Type is Right_Para)))
+					else if (!((lt.symbols[j - 1].Type is Tokens.Double || lt.symbols[j - 1].Type is Integer || lt.symbols[j - 1].Type is Variable || lt.symbols[j-1].Type is Right_Parenthesis)))
 					{
 						temp.Insert(j, new Symbol(Integer, 0));
 						addedOffset++;

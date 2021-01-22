@@ -12,7 +12,7 @@ namespace Interpreter.Models
 	*	<term> ::= <factor> <term_prime>
 	*	<term_prime> ::= ^ <factor> <term_prime>
 	*	<term_prime> ::= * <factor> <term_prime>
-	*	<term_prime> := / <factor> <term_prime>
+	*	<term_prime> ::= / <factor> <term_prime>
 	*	<factor> ::= number | <variable> | (<expr>)
 	*   <variable> ::= id
 	*/
@@ -206,17 +206,17 @@ namespace Interpreter.Models
 			{
 				Variable(level, false);
 			}
-			//Checks if it's a left para token 
-			else if (Match_Token((int)LookupTable.Tokens.Left_Para))
+			//Checks if it's a left parenthesis token 
+			else if (Match_Token((int)LookupTable.Tokens.Left_Parenthesis))
 			{
 				Advance_LookAhead();
 				Expression(level + 1);
-				//Checks if it is a right para token
-				if (Match_Token((int)LookupTable.Tokens.Right_Para))
+				//Checks if it is a right parenthesis token
+				if (Match_Token((int)LookupTable.Tokens.Right_Parenthesis))
 				{
 					Advance_LookAhead();
 				}
-				else ret = "Missing closing bracket";
+				else ret = "Missing closing parenthesis";
 				return;
 			}
 			//else ret = "Missing factor";

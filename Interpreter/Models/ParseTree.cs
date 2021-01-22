@@ -11,13 +11,13 @@ namespace Interpreter.Models
 		ParsedTreeNode root;
 		public int deepest_node;
 		public double final_result;
-		public ParsedTreeNode ABST;
+		public ParsedTreeNode AST;
 
 		public ParseTree()
 		{
 			root = new ParsedTreeNode(0, Tokens.EMPTY, null);
 			final_result = 0;
-			ABST = new ParsedTreeNode(0, Tokens.EMPTY, null);
+			AST = new ParsedTreeNode(0, Tokens.EMPTY, null);
 		}
 
 		//This function adds new nodes to the trie using their depth and parent value
@@ -55,14 +55,14 @@ namespace Interpreter.Models
 			}
 		}
 
-		public void SetABST()
+		public void SetAST()
 		{
-			ABST = new ParsedTreeNode(-1, Tokens.EMPTY, null);
+			AST = new ParsedTreeNode(-1, Tokens.EMPTY, null);
 
 			ArrayList toVisit = new ArrayList{root};
 			ArrayList Visited = new ArrayList();
 			ArrayList Operators = new ArrayList { Tokens.Plus, Tokens.Minus, Tokens.Multiply, Tokens.Divide, Tokens.Exponent, Tokens.Equal };
-			ParsedTreeNode lastOp = ABST;
+			ParsedTreeNode lastOp = AST;
 
 
 			while (toVisit.Count != 0)
@@ -79,7 +79,6 @@ namespace Interpreter.Models
 				{
 					lastOp.Children.Add(node);
 				}
-
 				if (node.IsLeaf() == false)
 				{
 					foreach (ParsedTreeNode toAdd in node.Children)

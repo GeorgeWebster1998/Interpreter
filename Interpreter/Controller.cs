@@ -12,9 +12,18 @@ namespace Interpreter
         {
             Config config = new Config();
             LookupTable lt = new LookupTable(config.MAX_TOKENS); // Class to store Tokens and Symbols
+            string Command = "";
 
-            //this is the command string which chooses which operation the interpreter will do
-            string Command = args[0].Trim(new Char[] { '[', ',', '\'', ']' });
+            try
+            {
+                //this is the command string which chooses which operation the interpreter will do
+                Command = args[0].Trim(new Char[] { '[', ',', '\'', ']' });
+            }
+            catch(Exception e)
+            {
+                new ErrorReply("Controller error", "No arguements given", Command).PrintToConsole();
+                return;
+            }
 
             //This sets it down the newton raphson root root.
             if (Command == "rootofpoly")
@@ -64,6 +73,9 @@ namespace Interpreter
                 }
 
                 //if no error has occured it returns the reply of the last statement/error 
+                lt.pt.SetAST();
+                reply = reply.ChangeAST(lt.pt.AST);
+
                 Console.WriteLine(JsonConvert.SerializeObject(reply));
 
                 return;
@@ -96,9 +108,9 @@ namespace Interpreter
                         {
                             result = new Executor(ref lt).ShuntYard();
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
-                            new ErrorReply("Executor error", "Overflow Exception", s).PrintToConsole();
+                            new ErrorReply("Executor error", e.Message, s).PrintToConsole();
                             return;
                         }
 
@@ -109,8 +121,8 @@ namespace Interpreter
                     }
                 }
                 //This sets the abst for output and then sends the reply
-                lt.pt.SetABST();
-                new PositiveReply(lt.pt.ABST, lt.variables, final_result).PrintToConsole();
+                lt.pt.SetAST();
+                new PositiveReply(lt.pt.AST, lt.variables, final_result).PrintToConsole();
                 return;
             }
             //if the command variable is not recognised it will throw this error
@@ -170,7 +182,7 @@ namespace Interpreter
             //If the lexer doesn't recognise any tokens it will throw this error
             else
             {
-                return new ErrorReply("Lexer Error", lexResult.Item2, s);
+                return new ErrorReply("Lexicon Error", lexResult.Item2, s);
             }
         }
     }

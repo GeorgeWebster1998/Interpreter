@@ -18,6 +18,7 @@ namespace Interpreter.Models
             }));
         }
 
+        internal abstract PositiveReply ChangeAST(ParsedTreeNode aST);
     }
 
     //This reply is used when reporting a positive return
@@ -38,6 +39,12 @@ namespace Interpreter.Models
             this.variables = variables;
             this.output = output;
         }
+
+        internal override PositiveReply ChangeAST(ParsedTreeNode AST)
+        {
+            this.AST = AST;
+            return this;
+        }
     }
 
     //This reply is used when reporting an error.
@@ -57,6 +64,11 @@ namespace Interpreter.Models
             this.type = type;
             this.error = error;
             this.location = location;
+        }
+
+        internal override PositiveReply ChangeAST(ParsedTreeNode aST)
+        {
+            throw new NotImplementedException();
         }
     }
 }

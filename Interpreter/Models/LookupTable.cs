@@ -19,8 +19,8 @@ namespace Interpreter.Models
 			Divide = 3,
 			Exponent = 4,
 			Equal = 5,
-			Left_Para = 7,
-			Right_Para = 8,
+			Left_Parenthesis = 7,
+			Right_Parenthesis = 8,
 			Integer = 9,
 			Double = 10,
 			Variable = 11

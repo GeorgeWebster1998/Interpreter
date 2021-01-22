@@ -2,8 +2,10 @@
   "profiles": {
     "Interpreter": {
       "commandName": "Project",
-      //"commandLineArgs": "\"expression\" \"['2+9']\"",
-      "commandLineArgs": "\"expression\" \"['2*5^3+7']\""
+      "commandLineArgs": "parse\" \"['(2* (5^3)+7* 5)+15']\",
+      //"commandLineArgs": "\"expression\" \"['(2* (5^3)+7* 5)+15']\""
+      
+      //"commandLineArgs": "\"expression\" \"['0.001 + 2']\""
       //"commandLineArgs": "\"rootofpoly\" \"['1.0','-9.0','23.0','-15.0']\""
     }
   }
