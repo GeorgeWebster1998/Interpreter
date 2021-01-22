@@ -166,7 +166,13 @@ namespace Interpreter
                         {
                             if (sym.Type is LookupTable.Tokens.Variable)
                             {
-                                variables.Add((string)sym.Value, null);
+                                try
+                                {
+                                    variables.Add((string)sym.Value, null);
+                                } catch (Exception)
+                                {
+
+                                }
                             }
                         }
                         return new PositiveReply( null, variables, 0);

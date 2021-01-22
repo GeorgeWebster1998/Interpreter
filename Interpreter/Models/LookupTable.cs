@@ -74,9 +74,23 @@ namespace Interpreter.Models
 		}
 
 		//Adds a variable to the dictionary
-		public void AddToVariables(string key, object value)
+		public void AddToVariables(string key, int v, bool isFromParseFunc)
 		{
-			variables.Add(key, value);
+			if (isFromParseFunc)
+			{
+				try
+				{
+					variables.Add(key, v);
+				}
+				catch (Exception)
+				{
+
+				}
+			}
+			else
+			{
+				variables.Add(key, v);
+			}
 		}
 
 		//Clears all variables

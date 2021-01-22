@@ -1,4 +1,5 @@
-﻿using static Interpreter.Models.LookupTable;
+﻿using System.Collections;
+using static Interpreter.Models.LookupTable;
 
 namespace Interpreter.Models
 {
@@ -24,6 +25,7 @@ namespace Interpreter.Models
 		readonly LookupTable lt;
 		readonly ParseTree trie;
 		readonly bool isFromParseFunc;
+		Stack toAdd = new Stack();
 
 		public Parser(ref LookupTable lt, bool isFromParseFunc)
 		{
@@ -171,6 +173,11 @@ namespace Interpreter.Models
 			{
 				trie.AddNewNode(level, "<<Term>>", "<<Term_Prime>>");
 				trie.AddNewNode(level + 1, "<<Term_Prime>>", Tokens.Exponent);
+				while (toAdd.Count > 0 && !(toAdd == null))
+				{
+					trie.AddNewNode(level + 2, Tokens.Exponent, toAdd.Pop());
+				}
+				
 				Advance_LookAhead();
 				Factor(level + 1, false);
 				Term_Prime(level + 1);
@@ -192,13 +199,27 @@ namespace Interpreter.Models
 			//Checks for a Integer token
 			if (Match_Token((int)LookupTable.Tokens.Integer))
 			{
-				trie.AddNewNode(level + 1, "<<Factor>>", lt.GetSymbol(currentToken).Value);
+				if (lt.GetSymbol(currentToken + 1).Type == Tokens.Exponent)
+				{
+					this.toAdd.Push((lt.GetSymbol(currentToken).Value));
+				}
+				else
+				{
+					trie.AddNewNode(level + 1, "<<Factor>>", lt.GetSymbol(currentToken).Value);
+				}
 				Advance_LookAhead();
 			}
 			//Looks for a double token
 			else if (Match_Token((int)LookupTable.Tokens.Double))
 			{
-				trie.AddNewNode(level + 1, "<<Factor>>", lt.GetSymbol(currentToken).Value);
+				if (lt.GetSymbol(currentToken + 1).Type == Tokens.Exponent)
+				{
+					this.toAdd.Push((lt.GetSymbol(currentToken).Value));
+				}
+				else
+				{
+					trie.AddNewNode(level + 1, "<<Factor>>", lt.GetSymbol(currentToken).Value);
+				}
 				Advance_LookAhead();
 			}
 			//Checks if it's a variable token
@@ -233,14 +254,14 @@ namespace Interpreter.Models
 				if (isStatement)
 				{
 					trie.AddNewNode(level, "<<Statement>>", (string)lt.GetSymbol(currentToken).Value);
-					lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, 0);
+					lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, 0, false);
 					Advance_LookAhead();
 					return true;
 				}
 				//this is used in the parse fork just to show the user what variables they need to init
 				else if (this.isFromParseFunc)
 				{
-					lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, 0);
+					lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, 0, isFromParseFunc);
 					Advance_LookAhead();
 					return true;
 				}
