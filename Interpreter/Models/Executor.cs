@@ -116,7 +116,6 @@ namespace Interpreter.Models
 					break;
 			}
 
-
 			if (fromParse)
 				operations.Add(op1output + "," + operatorOut + "," + op2output);
 			else if (operatorOut == "=")

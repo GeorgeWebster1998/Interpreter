@@ -31,6 +31,7 @@ namespace Interpreter.Models
         public List<string> ops;
         public Dictionary<string, object> variables;
         public double output;
+        public Dictionary<double, double> points;
 
         public PositiveReply(List<string> ops, Dictionary<string, object> variables, double output)
         {
@@ -38,6 +39,11 @@ namespace Interpreter.Models
             this.ops = ops;
             this.variables = variables;
             this.output = output;
+        }
+
+        public PositiveReply(List<string> ops, Dictionary<string, object> variables, double output, Dictionary<double, double> points) : this(ops, variables, output)
+        {
+            this.points = points;
         }
 
         internal override PositiveReply ChangeAST(ParsedTreeNode AST)

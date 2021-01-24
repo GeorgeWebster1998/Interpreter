@@ -140,6 +140,73 @@ namespace Interpreter
                 new PositiveReply(lt.operations, lt.variables, final_result).PrintToConsole();
                 return;
             }
+            else if (Command == "cal")
+            {
+                dynamic input = JsonConvert.DeserializeObject(args[1]);
+                string var = "";
+                double from = 0.0;
+                double to = 0.0;
+                double step = 0.0;
+                string expression = "";
+
+                int i = 0;
+
+                foreach(string obj in input)
+                {
+                    if (i == 0)
+                        var = obj;
+                    if (i == 1)
+                        from = Double.Parse(obj);
+                    if (i == 2)
+                        to = Double.Parse(obj);
+                    if (i == 3)
+                        step = Double.Parse(obj);
+                    if (i == 4)
+                        expression = obj;
+                    i++;
+                }
+
+
+                Dictionary<double, double> points = new Dictionary<double, double>();
+
+                while (from <= to) {
+                    Reply reply = Parse(ref lt, expression, false, (var,from));
+
+                    //if an error is found at any point it returns early with an error
+                    if (reply is ErrorReply)
+                    {
+                        Console.WriteLine(JsonConvert.SerializeObject(reply));
+                        return;
+                    }
+                    //if not it runs the executor
+                    else
+                    {
+                        //Init the executor and get the result of parsed tokens
+                        //then resets the symbol table for the next expression/statement
+                        Executor exe = new Executor(ref lt, false);
+
+                        try
+                        {
+                            points.Add(from, exe.ShuntYard());
+                        }
+                        catch (Exception e)
+                        {
+                            new ErrorReply("Executor error", e.Message, expression).PrintToConsole();
+                            return;
+                        }
+                        
+                        //This is used for output
+                        lt.InitSymbols(config.MAX_TOKENS);
+
+                        
+                     }
+                from += step;
+                }
+                //This sets the abst for output and then sends the reply
+                //lt.pt.SetAST();
+                new PositiveReply(lt.operations, lt.variables, 0 , points).PrintToConsole();
+                return;
+            }
             else if (Command == "env")
             {
                 while (true)
@@ -210,6 +277,46 @@ namespace Interpreter
             {
                 //Parsing begins
                 Parser parser = new Parser(ref lt, isFromParseFunc);
+                string parseResult = parser.Parse();
+
+                //If the parser correctly parses
+                if (parseResult == "p")
+                {
+                    //Creates a temporary variables dictionary
+                    //This is used to see if a stement/expression is BNF correct and
+                    //what variables it needs to execute.
+                    if (isFromParseFunc)
+                    {
+
+                        return new PositiveReply(null, lt.variables, 0);
+                    }
+                    return new PositiveReply(null, null, 0);
+                }
+                //If the parser encounters an error
+                else
+                {
+                    return new ErrorReply("Parser Error", parseResult, s);
+                }
+            }
+            //If the lexer doesn't recognise any tokens it will throw this error
+            else
+            {
+                return new ErrorReply("Lexicon Error", lexResult.Item2, s);
+            }
+        }
+
+        public static Reply Parse(ref LookupTable lt, string s, bool isFromParseFunc, (string, double) var)
+        {
+            //This inits the lexer and processes it
+            Lexicon lex = new Lexicon(ref s, ref lt);
+            (int, string) lexResult = lex.Process();
+
+            //If the lexer recognises more than one token it will parse the tokens
+            if (lexResult.Item1 > 0)
+            {
+                //Parsing begins
+                Parser parser = new Parser(ref lt, isFromParseFunc);
+                lt.AddToVariables(var.Item1, var.Item2, false);
                 string parseResult = parser.Parse();
 
                 //If the parser correctly parses
