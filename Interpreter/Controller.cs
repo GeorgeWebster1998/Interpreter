@@ -158,7 +158,6 @@ namespace Interpreter
                     if (reply is ErrorReply)
                     {
                         Console.WriteLine(JsonConvert.SerializeObject(reply));
-                        return;
                     }
                     //if not it runs the executor
                     else
@@ -175,7 +174,6 @@ namespace Interpreter
                         catch (Exception e)
                         {
                             new ErrorReply("Executor error", e.Message, input).PrintToConsole();
-                            return;
                         }
 
                         lt.InitSymbols(config.MAX_TOKENS);
@@ -183,18 +181,10 @@ namespace Interpreter
 
                         //This is used for output
                         final_result = result;
+                        new PositiveReply(lt.operations, lt.variables, final_result).PrintToConsole();
                     }
-
-                    //This sets the abst for output and then sends the reply
-                    //lt.pt.SetAST();
-                    new PositiveReply(lt.operations, lt.variables, final_result).PrintToConsole();
                 }
-
-
-
-
             }
-
             //if the command variable is not recognised it will throw this error
             else
             {

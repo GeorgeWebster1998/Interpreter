@@ -111,6 +111,7 @@ namespace Interpreter.Models
 
 				case Tokens.Equal:
 					lt.UpdateVariable(key: op1.Item1, operand2);
+					op1output = op1.Item1;
 					operatorOut = "=";
 					break;
 			}
@@ -118,8 +119,10 @@ namespace Interpreter.Models
 
 			if (fromParse)
 				operations.Add(op1output + "," + operatorOut + "," + op2output);
+			else if (operatorOut == "=")
+				operations.Add(op1output + "," + operatorOut + "," + operand2);
 			else
-				operations.Add( operand1 + "," + operatorOut + "," + operand1);
+				operations.Add( operand1 + "," + operatorOut + "," + operand2);
 		}
 
 		/// <summary>
