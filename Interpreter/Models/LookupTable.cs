@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Interpreter.Models
 {
@@ -12,12 +13,19 @@ namespace Interpreter.Models
 		[JsonConverter(typeof(StringEnumConverter))]
 		public enum Tokens : int
 		{
+			[Description(" ")]
 			EMPTY = -1,
+			[Description("+")]
 			Plus = 0,
+			[Description("-")]
 			Minus = 1,
+			[Description("*")]
 			Multiply = 2,
+			[Description("/")]
 			Divide = 3,
+			[Description("^")]
 			Exponent = 4,
+			[Description("=")]
 			Equal = 5,
 			Left_Parenthesis = 7,
 			Right_Parenthesis = 8,
@@ -35,6 +43,8 @@ namespace Interpreter.Models
 		public ParseTree pt;
 		//Uses the MAX_TOKENS to decide how large the symbol table should be
 		public int MAX_TOKENS;
+		//
+		public List<string> operations = new List<string>();
 
 		public LookupTable(int MAX_TOKENS)
 		{
@@ -70,7 +80,15 @@ namespace Interpreter.Models
 		//Gets the variable thats stored in the dictionary using key
 		public double GetVarValue(string key)
 		{
-			return Convert.ToDouble(variables[key]);
+			try
+			{
+				return Convert.ToDouble(variables[key]);
+			}
+			catch (Exception e)
+			{
+				return 0.0;
+			}
+
 		}
 
 		//Adds a variable to the dictionary

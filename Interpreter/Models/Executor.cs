@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using static Interpreter.Models.LookupTable;
 
 namespace Interpreter.Models
@@ -14,15 +15,18 @@ namespace Interpreter.Models
 		Stack Numbers;
 		double operand1, operand2;
 		Tokens operatorID;
+		public List<string> operations = new List<string>();
+		bool fromParse = false;
 
 		//Inits a fresh executor
-		public Executor(ref LookupTable lt)
+		public Executor(ref LookupTable lt, bool fromParse)
 		{
 			this.lt = lt;
 			Operators = new Stack();
 			Numbers = new Stack();
 			operand1 = operand2 = 0;
 			operatorID = Tokens.EMPTY;
+			this.fromParse = fromParse;
 		}
 
 		/// <summary>
@@ -36,6 +40,10 @@ namespace Interpreter.Models
 			//operand1 only has a tuple as only an = operation 
 			//requires the left operator to be set
 			(string, double) op1 = ("", 0);
+			(string, double) op2 = ("", 0);
+			string op1output = "";
+			string op2output = "";
+			string operatorOut = "";
 
 			operatorID = (Tokens)Operators.Pop();
 
@@ -44,23 +52,28 @@ namespace Interpreter.Models
 			if (Numbers.Peek() is string)
 			{
 				string var = (string)Numbers.Pop();
+				op2 = ((string)var, lt.GetVarValue((string)var));
 				operand2 = lt.GetVarValue((string)var);
+				op2output = var;
 			}
 			else
 			{
 				operand2 = Convert.ToDouble(Numbers.Pop());
+				op2output = operand2.ToString();
 			}
 			if (Numbers.Peek() is string)
 			{
 				string var = (string)Numbers.Pop();
 				op1 = ((string)var, lt.GetVarValue((string)var));
 				operand1 = lt.GetVarValue((string)var);
+				op1output = var;
 			}
 			else
 			{
 				operand1 = Convert.ToDouble(Numbers.Pop());
+				op1output = operand1.ToString();
 			}
-			
+
 			//This section is just a switch case to decide which operation
 			//should be performed to the two operands.
 			double result = 0;
@@ -69,32 +82,44 @@ namespace Interpreter.Models
 				case Tokens.Plus:
 					result = operand1 + operand2;
 					Numbers.Push(result);
+					operatorOut = "+";
 					break;
 
 				case Tokens.Minus:
 					result = operand1 - operand2;
 					Numbers.Push(result);
+					operatorOut = "-";
 					break;
 
 				case Tokens.Exponent:
 					result = Math.Pow(operand1, operand2);
 					Numbers.Push(result);
+					operatorOut = "^";
 					break;
 
 				case Tokens.Multiply:
 					result = operand1 * operand2;
 					Numbers.Push(result);
+					operatorOut = "*";
 					break;
 
 				case Tokens.Divide:
 					result = operand1 / operand2;
 					Numbers.Push(result);
+					operatorOut = "/";
 					break;
 
 				case Tokens.Equal:
 					lt.UpdateVariable(key: op1.Item1, operand2);
+					operatorOut = "=";
 					break;
 			}
+
+
+			if (fromParse)
+				operations.Add(op1output + "," + operatorOut + "," + op2output);
+			else
+				operations.Add( operand1 + "," + operatorOut + "," + operand1);
 		}
 
 		/// <summary>
@@ -156,7 +181,7 @@ namespace Interpreter.Models
 					case LookupTable.Tokens.Divide:
 						while (Operators.Count > 0 && (Tokens)Operators.Peek() != Tokens.Left_Parenthesis
 							&& (Tokens)Operators.Peek() != Tokens.Plus && (Tokens)Operators.Peek() != Tokens.Minus
-							&& (Tokens)Operators.Peek() != Tokens.Equal )
+							&& (Tokens)Operators.Peek() != Tokens.Equal)
 						{
 							Calculate();
 						}
@@ -166,14 +191,14 @@ namespace Interpreter.Models
 					case LookupTable.Tokens.Exponent:
 						while (Operators.Count > 0 && (Tokens)Operators.Peek() != Tokens.Left_Parenthesis
 							&& (Tokens)Operators.Peek() != Tokens.Plus && (Tokens)Operators.Peek() != Tokens.Minus
-							&& (Tokens)Operators.Peek() != Tokens.Equal && (Tokens)Operators.Peek() != Tokens.Multiply 
+							&& (Tokens)Operators.Peek() != Tokens.Equal && (Tokens)Operators.Peek() != Tokens.Multiply
 							&& (Tokens)Operators.Peek() != Tokens.Divide)
 						{
 							Calculate();
 						}
 						Operators.Push(lt.GetSymbol(count++).Type);
 						break;
-					
+
 					case LookupTable.Tokens.Left_Parenthesis:
 						Operators.Push(lt.GetSymbol(count++).Type);
 						break;

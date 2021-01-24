@@ -19,7 +19,7 @@ namespace Interpreter
                 //this is the command string which chooses which operation the interpreter will do
                 Command = args[0].Trim(new Char[] { '[', ',', '\'', ']' });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 new ErrorReply("Controller error", "No arguements given", Command).PrintToConsole();
                 return;
@@ -70,13 +70,25 @@ namespace Interpreter
                         Console.WriteLine(JsonConvert.SerializeObject(reply));
                         return;
                     }
+
+                    Executor exe = new Executor(ref lt, true);
+
+                    try
+                    {
+                        exe.ShuntYard();
+                        lt.operations = exe.operations;
+                    }
+                    catch (Exception e)
+                    {
+                        new ErrorReply("Executor error", e.Message, s).PrintToConsole();
+                        return;
+                    }
+
                 }
 
                 //if no error has occured it returns the reply of the last statement/error 
-                lt.pt.SetAST();
-                reply = reply.ChangeAST(lt.pt.AST);
 
-                Console.WriteLine(JsonConvert.SerializeObject(reply));
+                new PositiveReply(lt.operations, lt.variables, 0).PrintToConsole();
 
                 return;
 
@@ -85,12 +97,12 @@ namespace Interpreter
             else if (Command == "expression")
             {
                 dynamic text = JsonConvert.DeserializeObject(args[1]);
-                
+
                 double final_result = 0.0;
 
                 foreach (string s in text)
                 {
-                    Reply reply = Parse(ref lt, s,false);
+                    Reply reply = Parse(ref lt, s, false);
 
                     //if an error is found at any point it returns early with an error
                     if (reply is ErrorReply)
@@ -104,9 +116,11 @@ namespace Interpreter
                         //Init the executor and get the result of parsed tokens
                         //then resets the symbol table for the next expression/statement
                         double result = 0.0;
+                        Executor exe = new Executor(ref lt, false);
+
                         try
                         {
-                            result = new Executor(ref lt).ShuntYard();
+                            result = exe.ShuntYard();
                         }
                         catch (Exception e)
                         {
@@ -115,16 +129,72 @@ namespace Interpreter
                         }
 
                         lt.InitSymbols(config.MAX_TOKENS);
+                        lt.operations = exe.operations;
 
                         //This is used for output
                         final_result = result;
                     }
                 }
                 //This sets the abst for output and then sends the reply
-                lt.pt.SetAST();
-                new PositiveReply(lt.pt.AST, lt.variables, final_result).PrintToConsole();
+                //lt.pt.SetAST();
+                new PositiveReply(lt.operations, lt.variables, final_result).PrintToConsole();
                 return;
             }
+            else if (Command == "env")
+            {
+                while (true)
+                {
+                    string input = Console.ReadLine();
+                    double final_result = 0.0;
+
+                    if (input == "EXIT")
+                    {
+                        return;
+                    }
+
+                    Reply reply = Parse(ref lt, input, false);
+
+                    //if an error is found at any point it returns early with an error
+                    if (reply is ErrorReply)
+                    {
+                        Console.WriteLine(JsonConvert.SerializeObject(reply));
+                        return;
+                    }
+                    //if not it runs the executor
+                    else
+                    {
+                        //Init the executor and get the result of parsed tokens
+                        //then resets the symbol table for the next expression/statement
+                        double result = 0.0;
+                        Executor exe = new Executor(ref lt, false);
+
+                        try
+                        {
+                            result = exe.ShuntYard();
+                        }
+                        catch (Exception e)
+                        {
+                            new ErrorReply("Executor error", e.Message, input).PrintToConsole();
+                            return;
+                        }
+
+                        lt.InitSymbols(config.MAX_TOKENS);
+                        lt.operations = exe.operations;
+
+                        //This is used for output
+                        final_result = result;
+                    }
+
+                    //This sets the abst for output and then sends the reply
+                    //lt.pt.SetAST();
+                    new PositiveReply(lt.operations, lt.variables, final_result).PrintToConsole();
+                }
+
+
+
+
+            }
+
             //if the command variable is not recognised it will throw this error
             else
             {
@@ -151,7 +221,7 @@ namespace Interpreter
                 //Parsing begins
                 Parser parser = new Parser(ref lt, isFromParseFunc);
                 string parseResult = parser.Parse();
-                
+
                 //If the parser correctly parses
                 if (parseResult == "p")
                 {
@@ -160,24 +230,10 @@ namespace Interpreter
                     //what variables it needs to execute.
                     if (isFromParseFunc)
                     {
-                        Dictionary<string, object> variables = new Dictionary<string, object>();
 
-                        foreach (LookupTable.Symbol sym in lt.symbols)
-                        {
-                            if (sym.Type is LookupTable.Tokens.Variable)
-                            {
-                                try
-                                {
-                                    variables.Add((string)sym.Value, null);
-                                } catch (Exception)
-                                {
-
-                                }
-                            }
-                        }
-                        return new PositiveReply( null, variables, 0);
+                        return new PositiveReply(null, lt.variables, 0);
                     }
-                    return new PositiveReply( null, null, 0);
+                    return new PositiveReply(null, null, 0);
                 }
                 //If the parser encounters an error
                 else

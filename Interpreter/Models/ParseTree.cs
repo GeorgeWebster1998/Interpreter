@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using static Interpreter.Models.LookupTable;
 
 namespace Interpreter.Models
@@ -59,11 +58,10 @@ namespace Interpreter.Models
 		{
 			AST = new ParsedTreeNode(-1, Tokens.EMPTY, null);
 
-			ArrayList toVisit = new ArrayList{root};
+			ArrayList toVisit = new ArrayList { root };
 			ArrayList Visited = new ArrayList();
 			ArrayList Operators = new ArrayList { Tokens.Plus, Tokens.Minus, Tokens.Multiply, Tokens.Divide, Tokens.Exponent, Tokens.Equal };
 			ParsedTreeNode lastOp = AST;
-
 
 			while (toVisit.Count != 0)
 			{
@@ -73,7 +71,6 @@ namespace Interpreter.Models
 				{
 					lastOp.Children.Add(node);
 					lastOp = node;
-					
 				}
 				else if (!(node.Value is null) && !(node.ToString().Contains("<<")))
 				{
@@ -169,8 +166,8 @@ namespace Interpreter.Models
 
 			//Checks if a node is a leaf by checking how many children it has 
 			public bool IsLeaf()
-			{ 
-				return this.Children.Count == 0; 
+			{
+				return this.Children.Count == 0;
 			}
 
 

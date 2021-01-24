@@ -35,6 +35,7 @@ namespace Interpreter.Models
 			this.lt = lt;
 			this.trie = new ParseTree();
 			this.isFromParseFunc = isFromParseFunc;
+
 		}
 
 		//This is main function of the class
@@ -173,11 +174,6 @@ namespace Interpreter.Models
 			{
 				trie.AddNewNode(level, "<<Term>>", "<<Term_Prime>>");
 				trie.AddNewNode(level + 1, "<<Term_Prime>>", Tokens.Exponent);
-				while (toAdd.Count > 0 && !(toAdd == null))
-				{
-					trie.AddNewNode(level + 2, Tokens.Exponent, toAdd.Pop());
-				}
-				
 				Advance_LookAhead();
 				Factor(level + 1, false);
 				Term_Prime(level + 1);
@@ -186,7 +182,7 @@ namespace Interpreter.Models
 
 		//This is the factor BNF rule
 		void Factor(int level, bool isCalledFromTerm)
-		{	
+		{
 			//This decides if factor is a child node of term or term prime
 			if (isCalledFromTerm)
 			{
@@ -199,27 +195,13 @@ namespace Interpreter.Models
 			//Checks for a Integer token
 			if (Match_Token((int)LookupTable.Tokens.Integer))
 			{
-				if (lt.GetSymbol(currentToken + 1).Type == Tokens.Exponent)
-				{
-					this.toAdd.Push((lt.GetSymbol(currentToken).Value));
-				}
-				else
-				{
-					trie.AddNewNode(level + 1, "<<Factor>>", lt.GetSymbol(currentToken).Value);
-				}
+				trie.AddNewNode(level + 1, "<<Factor>>", lt.GetSymbol(currentToken).Value);
 				Advance_LookAhead();
 			}
 			//Looks for a double token
 			else if (Match_Token((int)LookupTable.Tokens.Double))
 			{
-				if (lt.GetSymbol(currentToken + 1).Type == Tokens.Exponent)
-				{
-					this.toAdd.Push((lt.GetSymbol(currentToken).Value));
-				}
-				else
-				{
-					trie.AddNewNode(level + 1, "<<Factor>>", lt.GetSymbol(currentToken).Value);
-				}
+				trie.AddNewNode(level + 1, "<<Factor>>", lt.GetSymbol(currentToken).Value);
 				Advance_LookAhead();
 			}
 			//Checks if it's a variable token
@@ -261,6 +243,8 @@ namespace Interpreter.Models
 				//this is used in the parse fork just to show the user what variables they need to init
 				else if (this.isFromParseFunc)
 				{
+					string varName = (string)lt.GetSymbol(currentToken).Value;
+					trie.AddNewNode(level + 1, "<<Factor>>", (string)varName);
 					lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, 0, isFromParseFunc);
 					Advance_LookAhead();
 					return true;
@@ -277,7 +261,7 @@ namespace Interpreter.Models
 				else
 				{
 					ret = "Variable " + lt.GetSymbol(currentToken).Value + " not initialised";
-					Advance_LookAhead();		
+					Advance_LookAhead();
 				}
 			}
 			return false;

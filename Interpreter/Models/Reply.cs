@@ -28,21 +28,21 @@ namespace Interpreter.Models
     //output: will be the result of the last expression/statement
     public class PositiveReply : Reply
     {
-        public ParsedTreeNode AST;
+        public List<string> ops;
         public Dictionary<string, object> variables;
         public double output;
 
-        public PositiveReply(ParsedTreeNode AST, Dictionary<string, object> variables, double output)
+        public PositiveReply(List<string> ops, Dictionary<string, object> variables, double output)
         {
             this.status = "good";
-            this.AST = AST;
+            this.ops = ops;
             this.variables = variables;
             this.output = output;
         }
 
         internal override PositiveReply ChangeAST(ParsedTreeNode AST)
         {
-            this.AST = AST;
+            //this.AST = AST;
             return this;
         }
     }
