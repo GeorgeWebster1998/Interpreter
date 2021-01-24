@@ -12,10 +12,7 @@ namespace Interpreter.Models
         public string status;
         public void PrintToConsole()
         {
-            Console.WriteLine(JsonConvert.SerializeObject(this, new JsonSerializerSettings
-            {
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects
-            }));
+            Console.WriteLine(JsonConvert.SerializeObject(this));
         }
 
         internal abstract PositiveReply ChangeAST(ParsedTreeNode aST);

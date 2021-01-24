@@ -199,7 +199,7 @@ namespace Interpreter
                         lt.InitSymbols(config.MAX_TOKENS);
 
                         
-                     }
+                    }
                 from += step;
                 }
                 //This sets the abst for output and then sends the reply
