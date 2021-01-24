@@ -245,7 +245,7 @@ namespace Interpreter.Models
 				{
 					string varName = (string)lt.GetSymbol(currentToken).Value;
 					trie.AddNewNode(level + 1, "<<Factor>>", (string)varName);
-					lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, 0, isFromParseFunc);
+					lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, 1, isFromParseFunc);
 					Advance_LookAhead();
 					return true;
 				}
