@@ -44,8 +44,10 @@ namespace Interpreter
                 }
                 var fs_list = ListModule.OfSeq(inputs);
 
+                double result = NewtonRoot.CNewton(fs_list, seed, error);
+
                 //This calls and replys back the result from the f# method
-                new PositiveReply(null, null, NewtonRoot.CNewton(fs_list, seed, error)).PrintToConsole();
+                new PositiveReply(null, null, result).PrintToConsole();
 
                 return;
             }
@@ -253,6 +255,9 @@ namespace Interpreter
                 new ErrorReply("Interpreter error", "Unknown command", Command).PrintToConsole();
             }
         }
+
+
+
 
         /// <summary>
         /// This function is the parser but modular so both forks can use it
