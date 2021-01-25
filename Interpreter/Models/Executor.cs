@@ -10,23 +10,24 @@ namespace Interpreter.Models
 	//Yard algorithm by Rudy Lapeer. 
 	public class Executor
 	{
-		LookupTable lt;
-		Stack Operators;
-		Stack Numbers;
+		LookupTable LT { get; set; }
+		Stack Operators { get; set; }
+		Stack Numbers { get; set; }
 		double operand1, operand2;
 		Tokens operatorID;
-		public List<string> operations = new List<string>();
+		public List<string> operations { get; set; }
 		bool fromParse = false;
 
 		//Inits a fresh executor
 		public Executor(ref LookupTable lt, bool fromParse)
 		{
-			this.lt = lt;
+			this.LT = lt;
 			Operators = new Stack();
 			Numbers = new Stack();
 			operand1 = operand2 = 0;
 			operatorID = Tokens.EMPTY;
 			this.fromParse = fromParse;
+			operations = new List<string>();
 		}
 
 		/// <summary>
@@ -52,8 +53,8 @@ namespace Interpreter.Models
 			if (Numbers.Peek() is string)
 			{
 				string var = (string)Numbers.Pop();
-				op2 = ((string)var, lt.GetVarValue((string)var));
-				operand2 = lt.GetVarValue((string)var);
+				op2 = (var, (double)LT.variables[var]);
+				operand2 = op2.Item2;
 				op2output = var;
 			}
 			else
@@ -64,8 +65,8 @@ namespace Interpreter.Models
 			if (Numbers.Peek() is string)
 			{
 				string var = (string)Numbers.Pop();
-				op1 = ((string)var, lt.GetVarValue((string)var));
-				operand1 = lt.GetVarValue((string)var);
+				op1 = (var, (double)LT.variables[var]);
+				operand1 = op1.Item2;
 				op1output = var;
 			}
 			else
@@ -110,18 +111,13 @@ namespace Interpreter.Models
 					break;
 
 				case Tokens.Equal:
-					lt.UpdateVariable(key: op1.Item1, operand2);
+					LT.UpdateVariable(key: op1.Item1, operand2);
 					op1output = op1.Item1;
 					operatorOut = "=";
 					break;
 			}
 
-			if (fromParse)
-				operations.Add(op1output + "," + operatorOut + "," + op2output);
-			else if (operatorOut == "=")
-				operations.Add(op1output + "," + operatorOut + "," + operand2);
-			else
-				operations.Add( operand1 + "," + operatorOut + "," + operand2);
+			operations.Add(op1output + "," + operatorOut + "," + op2output);
 		}
 
 		/// <summary>
@@ -134,24 +130,24 @@ namespace Interpreter.Models
 		{
 			int count = 0;
 
-			while (count < lt.symbols.Length)
+			while (count < LT.symbols.Length)
 			{
-				switch (lt.GetSymbol(count).Type)
+				switch (LT.GetSymbol(count).Type)
 				{
 					case Tokens.Integer:
-						Numbers.Push(lt.GetSymbol(count++).Value);
+						Numbers.Push(LT.GetSymbol(count++).Value);
 						break;
 
 					case Tokens.Double:
-						Numbers.Push(lt.GetSymbol(count++).Value);
+						Numbers.Push(LT.GetSymbol(count++).Value);
 						break;
 
 					case Tokens.Variable:
-						Numbers.Push(lt.GetSymbol(count++).Value);
+						Numbers.Push(LT.GetSymbol(count++).Value);
 						break;
 
 					case Tokens.Equal:
-						Operators.Push(lt.GetSymbol(count++).Type);
+						Operators.Push(LT.GetSymbol(count++).Type);
 						break;
 
 					case Tokens.Plus:
@@ -159,7 +155,7 @@ namespace Interpreter.Models
 						{
 							Calculate();
 						}
-						Operators.Push(lt.GetSymbol(count++).Type);
+						Operators.Push(LT.GetSymbol(count++).Type);
 						break;
 
 					case LookupTable.Tokens.Minus:
@@ -167,7 +163,7 @@ namespace Interpreter.Models
 						{
 							Calculate();
 						}
-						Operators.Push(lt.GetSymbol(count++).Type);
+						Operators.Push(LT.GetSymbol(count++).Type);
 						break;
 
 					case LookupTable.Tokens.Multiply:
@@ -177,7 +173,7 @@ namespace Interpreter.Models
 						{
 							Calculate();
 						}
-						Operators.Push(lt.GetSymbol(count++).Type);
+						Operators.Push(LT.GetSymbol(count++).Type);
 						break;
 
 					case LookupTable.Tokens.Divide:
@@ -187,7 +183,7 @@ namespace Interpreter.Models
 						{
 							Calculate();
 						}
-						Operators.Push(lt.GetSymbol(count++).Type);
+						Operators.Push(LT.GetSymbol(count++).Type);
 						break;
 
 					case LookupTable.Tokens.Exponent:
@@ -198,11 +194,11 @@ namespace Interpreter.Models
 						{
 							Calculate();
 						}
-						Operators.Push(lt.GetSymbol(count++).Type);
+						Operators.Push(LT.GetSymbol(count++).Type);
 						break;
 
 					case LookupTable.Tokens.Left_Parenthesis:
-						Operators.Push(lt.GetSymbol(count++).Type);
+						Operators.Push(LT.GetSymbol(count++).Type);
 						break;
 
 					case LookupTable.Tokens.Right_Parenthesis:

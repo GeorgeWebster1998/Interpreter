@@ -8,14 +8,14 @@ namespace Interpreter.Models
 	public class ParseTree
 	{
 		ParsedTreeNode root;
-		public int deepest_node;
-		public double final_result;
-		public ParsedTreeNode AST;
+		public int Deepest_node { get; set; }
+		public double Final_result { get; set; }
+		public ParsedTreeNode AST { get; set; }
 
 		public ParseTree()
 		{
 			root = new ParsedTreeNode(0, Tokens.EMPTY, null);
-			final_result = 0;
+			Final_result = 0;
 			AST = new ParsedTreeNode(0, Tokens.EMPTY, null);
 		}
 
@@ -32,9 +32,9 @@ namespace Interpreter.Models
 				if (node.Value == parentValue && node.Depth == depth - 1)
 				{
 					node.Children.Add(new ParsedTreeNode(depth, parentValue, value));
-					if (depth > deepest_node)
+					if (depth > Deepest_node)
 					{
-						deepest_node = depth;
+						Deepest_node = depth;
 					}
 					return;
 				}

@@ -19,7 +19,7 @@ namespace Interpreter
                 //this is the command string which chooses which operation the interpreter will do
                 Command = args[0].Trim(new Char[] { '[', ',', '\'', ']' });
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 new ErrorReply("Controller error", "No arguements given", Command).PrintToConsole();
                 return;
@@ -70,20 +70,6 @@ namespace Interpreter
                         Console.WriteLine(JsonConvert.SerializeObject(reply));
                         return;
                     }
-
-                    Executor exe = new Executor(ref lt, true);
-
-                    try
-                    {
-                        exe.ShuntYard();
-                        lt.operations = exe.operations;
-                    }
-                    catch (Exception e)
-                    {
-                        new ErrorReply("Executor error", e.Message, s).PrintToConsole();
-                        return;
-                    }
-
                 }
 
                 //if no error has occured it returns the reply of the last statement/error 
@@ -128,7 +114,7 @@ namespace Interpreter
                             return;
                         }
 
-                        lt.InitSymbols(config.MAX_TOKENS);
+                        lt.InitSymbols();
                         lt.operations = exe.operations;
 
                         //This is used for output
@@ -136,7 +122,7 @@ namespace Interpreter
                     }
                 }
                 //This sets the abst for output and then sends the reply
-                //lt.pt.SetAST();
+                //LT.pt.SetAST();
                 new PositiveReply(lt.operations, lt.variables, final_result).PrintToConsole();
                 return;
             }
@@ -151,7 +137,7 @@ namespace Interpreter
 
                 int i = 0;
 
-                foreach(string obj in input)
+                foreach (string obj in input)
                 {
                     if (i == 0)
                         var = obj;
@@ -169,8 +155,9 @@ namespace Interpreter
 
                 Dictionary<double, double> points = new Dictionary<double, double>();
 
-                while (from <= to) {
-                    Reply reply = Parse(ref lt, expression, false, (var,from));
+                while (from <= to)
+                {
+                    Reply reply = Parse(ref lt, expression, false, (var, from));
 
                     //if an error is found at any point it returns early with an error
                     if (reply is ErrorReply)
@@ -194,23 +181,29 @@ namespace Interpreter
                             new ErrorReply("Executor error", e.Message, expression).PrintToConsole();
                             return;
                         }
-                        
-                        //This is used for output
-                        lt.InitSymbols(config.MAX_TOKENS);
 
-                        
+                        //This is used for output
+                        lt.InitSymbols();
+
+
                     }
-                from += step;
+                    from += step;
                 }
                 //This sets the abst for output and then sends the reply
-                //lt.pt.SetAST();
-                new PositiveReply(lt.operations, lt.variables, 0 , points).PrintToConsole();
+                //LT.pt.SetAST();
+                new PositiveReply(lt.operations, lt.variables, points.Count, points).PrintToConsole();
                 return;
             }
             else if (Command == "env")
             {
+                Executor exe = new Executor(ref lt, false);
+
                 while (true)
                 {
+                    Console.WriteLine("------------");
+
+                    Dictionary<string, object> vars = new Dictionary<string, object>();
+
                     string input = Console.ReadLine();
                     double final_result = 0.0;
 
@@ -220,6 +213,9 @@ namespace Interpreter
                     }
 
                     Reply reply = Parse(ref lt, input, false);
+
+                    foreach (KeyValuePair<string, object> pair in vars)
+                        lt.variables.Add(pair.Key, pair.Value);
 
                     //if an error is found at any point it returns early with an error
                     if (reply is ErrorReply)
@@ -232,24 +228,23 @@ namespace Interpreter
                         //Init the executor and get the result of parsed tokens
                         //then resets the symbol table for the next expression/statement
                         double result = 0.0;
-                        Executor exe = new Executor(ref lt, false);
 
                         try
                         {
+
                             result = exe.ShuntYard();
+                            //This is used for output
+                            final_result = result;
+                            new PositiveReply(exe.operations, lt.variables, final_result).PrintToConsole();
                         }
                         catch (Exception e)
                         {
                             new ErrorReply("Executor error", e.Message, input).PrintToConsole();
                         }
 
-                        lt.InitSymbols(config.MAX_TOKENS);
-                        lt.operations = exe.operations;
-
-                        //This is used for output
-                        final_result = result;
-                        new PositiveReply(lt.operations, lt.variables, final_result).PrintToConsole();
                     }
+                    exe.operations.Clear();
+                    lt.InitSymbols();
                 }
             }
             //if the command variable is not recognised it will throw this error

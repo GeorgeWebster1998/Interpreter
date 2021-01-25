@@ -9,12 +9,12 @@ namespace Interpreter.Models
     public class Lexicon
     {
         readonly string input; //Input parsed through reference
-        readonly LookupTable lt; //Lookup Table parsed thorugh reference
+        readonly LookupTable LT; //Lookup Table parsed thorugh reference
 
         public Lexicon(ref string input, ref LookupTable lt)
         {
             this.input = input;
-            this.lt = lt;
+            this.LT = lt;
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Interpreter.Models
             int token_i = 0; //Token Counter
             for (int i = 0; i < input_length; ++i) //For loop to go through input
             {
-                if (token_i == lt.MAX_TOKENS) //If token count is the same size as max tokens stop the lexer 
+                if (token_i == LT.MAX_TOKENS) //If token count is the same size as max tokens stop the lexer 
                     break;
 
                 switch (input[i])
@@ -37,55 +37,55 @@ namespace Interpreter.Models
 
                     case ('='): //Used to assign variable
                         {
-                            lt.symbols[token_i++] = new Symbol(Equal, 0);
+                            LT.symbols[token_i++] = new Symbol(Equal, 0);
                             break;
                         }
 
                     case ('+'): //Used to add the plus to the token array
                         {
-                            lt.symbols[token_i++] = new Symbol(Plus, 0);
+                            LT.symbols[token_i++] = new Symbol(Plus, 0);
                             break;
                         }
 
                     case ('-'): //Used to add the minus to the token array
                         {
-                            lt.symbols[token_i++] = new Symbol(Minus, 0);
+                            LT.symbols[token_i++] = new Symbol(Minus, 0);
                             break;
                         }
 
                     case ('^'): //Used to add the multiplication to the token array
                         {
-                            lt.symbols[token_i++] = new Symbol(Exponent, 0);
+                            LT.symbols[token_i++] = new Symbol(Exponent, 0);
                             break;
                         }
 
                     case ('*'): //Used to add the multiplication to the token array
                         {
-                            lt.symbols[token_i++] = new Symbol(Multiply, 0);
+                            LT.symbols[token_i++] = new Symbol(Multiply, 0);
                             break;
                         }
 
                     case ('/'): //Used to add the division to the token array
                         {
-                            lt.symbols[token_i++] = new Symbol(Divide, 0);
+                            LT.symbols[token_i++] = new Symbol(Divide, 0);
                             break;
                         }
 
                     case ('('): //Used to add the left bracket to the token array
                         {
-                            lt.symbols[token_i++] = new Symbol(Left_Parenthesis, 0);
+                            LT.symbols[token_i++] = new Symbol(Left_Parenthesis, 0);
                             break;
                         }
 
                     case (')'): //Used to add the right bracket to the token array
                         {
-                            lt.symbols[token_i++] = new Symbol(Right_Parenthesis, 0);
+                            LT.symbols[token_i++] = new Symbol(Right_Parenthesis, 0);
                             break;
                         }
 
                     case ('P'): //Used to add Pi to then token array
                         {
-                            lt.symbols[token_i++] = new Symbol(LookupTable.Tokens.Double, 3.14159);
+                            LT.symbols[token_i++] = new Symbol(LookupTable.Tokens.Double, 3.14159);
                             break;
                         }
 
@@ -112,7 +112,7 @@ namespace Interpreter.Models
                                         break;
                                     }
                                 }
-                                lt.symbols[token_i++] = new Symbol(Tokens.Variable, varName);
+                                LT.symbols[token_i++] = new Symbol(Tokens.Variable, varName);
                                 --i;
                                 break;
                             }
@@ -145,18 +145,18 @@ namespace Interpreter.Models
                                 {
                                     if (isFloat)
                                     {
-                                        lt.symbols[token_i++] = new Symbol(Tokens.Double, double.Parse(new string(number)));
+                                        LT.symbols[token_i++] = new Symbol(Tokens.Double, double.Parse(new string(number)));
                                     }
                                     else
                                     {
-                                        lt.symbols[token_i++] = new Symbol(Integer, int.Parse(new string(number)));
+                                        LT.symbols[token_i++] = new Symbol(Integer, int.Parse(new string(number)));
                                     }
                                 }
                                 catch (Exception)
                                 {
                                     try
                                     {
-                                        lt.symbols[token_i++] = new Symbol(Tokens.Double, double.Parse(new string(number)));
+                                        LT.symbols[token_i++] = new Symbol(Tokens.Double, double.Parse(new string(number)));
                                     }
                                     catch (OverflowException)
                                     {
@@ -174,7 +174,7 @@ namespace Interpreter.Models
             }
 
             int addedOffset = 0;
-            ArrayList temp = new ArrayList(lt.symbols);
+            ArrayList temp = new ArrayList(LT.symbols);
 
             //This loops over symbols if it finds a factor next to a variable next to
             //a variable it automatically adds a multiply, allowing for the input of
@@ -185,37 +185,37 @@ namespace Interpreter.Models
             //-5 = 0-5 
             for (int j = 0; j < (token_i + addedOffset); j++)
             {
-                if (lt.symbols[j].Type is Tokens.Double || lt.symbols[j].Type is Integer)
+                if (LT.symbols[j].Type is Tokens.Double || LT.symbols[j].Type is Integer)
                 {
-                    if (lt.symbols[j + 1].Type is Tokens.Variable)
+                    if (LT.symbols[j + 1].Type is Tokens.Variable)
                     {
                         temp.Insert(j + 1 + addedOffset, new Symbol(Multiply, 0));
                         addedOffset++;
                     }
                 }
 
-                if (lt.symbols[j].Type is Tokens.Minus)
+                if (LT.symbols[j].Type is Tokens.Minus)
                 {
                     if (j == 0)
                     {
                         temp.Insert(j, new Symbol(Integer, 0));
                         addedOffset++;
                     }
-                    else if (!((lt.symbols[j - 1].Type is Tokens.Double || lt.symbols[j - 1].Type is Integer || lt.symbols[j - 1].Type is Variable || lt.symbols[j - 1].Type is Right_Parenthesis)))
+                    else if (!((LT.symbols[j - 1].Type is Tokens.Double || LT.symbols[j - 1].Type is Integer || LT.symbols[j - 1].Type is Variable || LT.symbols[j - 1].Type is Right_Parenthesis)))
                     {
                         temp.Insert(j, new Symbol(Integer, 0));
                         addedOffset++;
                     }
                 }
             }
-            Array.Copy(temp.ToArray(typeof(Symbol)), 0, lt.symbols, 0, token_i + addedOffset);
+            Array.Copy(temp.ToArray(typeof(Symbol)), 0, LT.symbols, 0, token_i + addedOffset);
 
             //This fills the rest of the symbol array with EMPTY tokens in order to make sure
             //no unpredictable data can cause bugs.
             int fill_array = token_i + addedOffset;
-            while (fill_array < lt.symbols.Length)
+            while (fill_array < LT.symbols.Length)
             {
-                lt.symbols[fill_array++] = new Symbol(Tokens.EMPTY, 0.0);
+                LT.symbols[fill_array++] = new Symbol(Tokens.EMPTY, 0.0);
             }
 
             return (token_i, "true");

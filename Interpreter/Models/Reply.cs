@@ -25,10 +25,10 @@ namespace Interpreter.Models
     //output: will be the result of the last expression/statement
     public class PositiveReply : Reply
     {
-        public List<string> ops;
-        public Dictionary<string, object> variables;
-        public double output;
-        public Dictionary<double, double> points;
+        public List<string> ops { get; set; }
+        public Dictionary<string, object> variables { get; set; }
+        public double output { get; set; }
+        public Dictionary<double, double> points { get; set; }
 
         public PositiveReply(List<string> ops, Dictionary<string, object> variables, double output)
         {
@@ -57,9 +57,9 @@ namespace Interpreter.Models
     //location: is what expression/statement it happened on
     public class ErrorReply : Reply
     {
-        public string type;
-        public string error;
-        public string location;
+        public string type { get; set; }
+        public string error { get; set; }
+        public string location { get; set; }
 
         public ErrorReply(string type, string error, string location)
         {

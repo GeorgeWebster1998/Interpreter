@@ -7,8 +7,8 @@
       //"commandLineArgs": "\"expression\" \"['x=2','(2* (x^3)+7*x)+15']\""
       //"commandLineArgs": "\"expression\" \"['0.001 + 2']\""
       //"commandLineArgs": "\"rootofpoly\" \"['1.0','-9.0','23.0','-15.0']\""
-      //"commandLineArgs": "\"env\""
-      "commandLineArgs": "\"cal\" \"['x', '100', '1000', '100',  '2x+5']\""
+      "commandLineArgs": "\"env\""
+      //"commandLineArgs": "\"cal\" \"['x', '100', '1000', '100',  '2x+5']\""
 
     }
   }

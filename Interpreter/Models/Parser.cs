@@ -21,18 +21,17 @@ namespace Interpreter.Models
 	{
 		int LookAhead;
 		int currentToken;
-		string ret;
-		readonly LookupTable lt;
+		string Return { get; set; }
+		readonly LookupTable LT;
 		readonly ParseTree trie;
 		readonly bool isFromParseFunc;
-		Stack toAdd = new Stack();
 
 		public Parser(ref LookupTable lt, bool isFromParseFunc)
 		{
 			this.LookAhead = -1;
 			this.currentToken = 0;
-			this.ret = "p";
-			this.lt = lt;
+			this.Return = "p";
+			this.LT = lt;
 			this.trie = new ParseTree();
 			this.isFromParseFunc = isFromParseFunc;
 
@@ -42,15 +41,15 @@ namespace Interpreter.Models
 		public string Parse()
 		{
 			Statement(0);
-			lt.SetParsedTrie(trie);
-			return ret;
+			LT.SetParsedTrie(trie);
+			return Return;
 		}
 
 		//This function checks to see if the token parsed and the token in 
 		//the symbol table match 
 		bool Match_Token(int token)
 		{
-			this.LookAhead = (int)lt.symbols[currentToken].Type;
+			this.LookAhead = (int)LT.symbols[currentToken].Type;
 			return (LookAhead.Equals(token));
 
 		}
@@ -58,20 +57,20 @@ namespace Interpreter.Models
 		//This sets the lookahead forward by one index allowing the program to see what comes next
 		void Advance_LookAhead()
 		{
-			this.LookAhead = (int)lt.symbols[++currentToken].Type;
+			this.LookAhead = (int)LT.symbols[++currentToken].Type;
 		}
 
 		//This function is the statement BNF rule
 		void Statement(int level)
 		{
 			//Checks to see if it is a statement with a variable assignment
-			if (lt.GetSymbol(1).Type == Tokens.Equal)
+			if (LT.GetSymbol(1).Type == Tokens.Equal)
 			{
 				trie.AddNewNode(level, Tokens.EMPTY, "<<Statement>>");
 				if (!(Variable(level + 1, true)))
 				{
 					//returns an error if someone tries to assign a value to anything other than a variable
-					ret = "Can't assign data to " + lt.symbols[currentToken].Type;
+					Return = "Can't assign data to " + LT.symbols[currentToken].Type;
 					return;
 				}
 
@@ -195,13 +194,13 @@ namespace Interpreter.Models
 			//Checks for a Integer token
 			if (Match_Token((int)LookupTable.Tokens.Integer))
 			{
-				trie.AddNewNode(level + 1, "<<Factor>>", lt.GetSymbol(currentToken).Value);
+				trie.AddNewNode(level + 1, "<<Factor>>", LT.GetSymbol(currentToken).Value);
 				Advance_LookAhead();
 			}
 			//Looks for a double token
 			else if (Match_Token((int)LookupTable.Tokens.Double))
 			{
-				trie.AddNewNode(level + 1, "<<Factor>>", lt.GetSymbol(currentToken).Value);
+				trie.AddNewNode(level + 1, "<<Factor>>", LT.GetSymbol(currentToken).Value);
 				Advance_LookAhead();
 			}
 			//Checks if it's a variable token
@@ -219,7 +218,7 @@ namespace Interpreter.Models
 				{
 					Advance_LookAhead();
 				}
-				else ret = "Missing closing parenthesis";
+				else Return = "Missing closing parenthesis";
 				return;
 			}
 			//else ret = "Missing factor";
@@ -235,32 +234,33 @@ namespace Interpreter.Models
 				//this checks if its from a statement as it will be used to assign not reference
 				if (isStatement)
 				{
-					trie.AddNewNode(level, "<<Statement>>", (string)lt.GetSymbol(currentToken).Value);
-					lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, 0, false);
+					trie.AddNewNode(level, "<<Statement>>", (string)LT.GetSymbol(currentToken).Value);
+					if (!(LT.VariableExist((string)LT.GetSymbol(currentToken).Value)))
+						LT.AddToVariables((string)LT.GetSymbol(currentToken).Value, 0, false);
 					Advance_LookAhead();
 					return true;
 				}
 				//this is used in the parse fork just to show the user what variables they need to init
 				else if (this.isFromParseFunc)
 				{
-					string varName = (string)lt.GetSymbol(currentToken).Value;
+					string varName = (string)LT.GetSymbol(currentToken).Value;
 					trie.AddNewNode(level + 1, "<<Factor>>", (string)varName);
-					lt.AddToVariables((string)lt.GetSymbol(currentToken).Value, 1, isFromParseFunc);
+					//LT.AddToVariables((string)LT.GetSymbol(currentToken).Value, 1, isFromParseFunc);
 					Advance_LookAhead();
 					return true;
 				}
 				//this is used if the variable is already declared and initialised 
-				else if (lt.VariableExist((string)lt.GetSymbol(currentToken).Value))
+				else if (LT.VariableExist((string)LT.GetSymbol(currentToken).Value))
 				{
-					string varName = (string)lt.GetSymbol(currentToken).Value;
-					trie.AddNewNode(level + 1, "<<Factor>>", (string)varName + " -> " + lt.GetVarValue(varName));
+					string varName = (string)LT.GetSymbol(currentToken).Value;
+					trie.AddNewNode(level + 1, "<<Factor>>", (string)varName + " -> " + LT.GetVarValue(varName));
 					Advance_LookAhead();
 					return true;
 				}
 				//this is used if a variable is used but not declared
 				else
 				{
-					ret = "Variable " + lt.GetSymbol(currentToken).Value + " not initialised";
+					Return = "Variable " + LT.GetSymbol(currentToken).Value + " not initialised";
 					Advance_LookAhead();
 				}
 			}

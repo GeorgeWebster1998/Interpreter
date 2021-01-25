@@ -7,9 +7,9 @@ namespace Interpreter.Models
     /// Class allows for importing custom settings for the Interpreter
     public class Config
     {
-        public int MAX_TOKENS; //Sets the maximum number of tokens the lexer will define
-        public double ErrorMargin; //Sets the error margin for the newton raphson f# implementation
-        public int Seed; //Sets the seed for the for the newton raphson f# implementation
+        public int MAX_TOKENS { get; set; } //Sets the maximum number of tokens the lexer will define
+        public double ErrorMargin { get; set; } //Sets the error margin for the newton raphson f# implementation
+        public int Seed { get; set; } //Sets the seed for the for the newton raphson f# implementation
 
         /// <summary>
         /// Creates an object with default values if a config file is found
