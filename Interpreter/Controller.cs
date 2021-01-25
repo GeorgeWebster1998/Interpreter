@@ -64,7 +64,7 @@ namespace Interpreter
                 foreach (string s in text)
                 {
                     //This sets the reply from the parse function
-                    reply = Parse(ref lt, s, true);
+                    reply = Parse(ref lt, s, true, ("",0));
 
                     //If an error has occured te interpreter returns it before parsing all loops
                     if (reply is ErrorReply)
@@ -90,7 +90,7 @@ namespace Interpreter
 
                 foreach (string s in text)
                 {
-                    Reply reply = Parse(ref lt, s, false);
+                    Reply reply = Parse(ref lt, s, false, ("",0));
 
                     //if an error is found at any point it returns early with an error
                     if (reply is ErrorReply)
@@ -214,7 +214,7 @@ namespace Interpreter
                         return;
                     }
 
-                    Reply reply = Parse(ref lt, input, false);
+                    Reply reply = Parse(ref lt, input, false, ("",0));
 
                     foreach (KeyValuePair<string, object> pair in vars)
                         lt.variables.Add(pair.Key, pair.Value);
@@ -257,8 +257,6 @@ namespace Interpreter
         }
 
 
-
-
         /// <summary>
         /// This function is the parser but modular so both forks can use it
         /// </summary>
@@ -266,45 +264,6 @@ namespace Interpreter
         /// <param name="s"> string s</param>
         /// <param name="isFromParseFunc"> bool for checking which function the call came from</param>
         /// <returns></returns>
-        public static Reply Parse(ref LookupTable lt, string s, bool isFromParseFunc)
-        {
-            //This inits the lexer and processes it
-            Lexicon lex = new Lexicon(ref s, ref lt);
-            (int, string) lexResult = lex.Process();
-
-            //If the lexer recognises more than one token it will parse the tokens
-            if (lexResult.Item1 > 0)
-            {
-                //Parsing begins
-                Parser parser = new Parser(ref lt, isFromParseFunc);
-                string parseResult = parser.Parse();
-
-                //If the parser correctly parses
-                if (parseResult == "p")
-                {
-                    //Creates a temporary variables dictionary
-                    //This is used to see if a stement/expression is BNF correct and
-                    //what variables it needs to execute.
-                    if (isFromParseFunc)
-                    {
-
-                        return new PositiveReply(null, lt.variables, 0);
-                    }
-                    return new PositiveReply(null, null, 0);
-                }
-                //If the parser encounters an error
-                else
-                {
-                    return new ErrorReply("Parser Error", parseResult, s);
-                }
-            }
-            //If the lexer doesn't recognise any tokens it will throw this error
-            else
-            {
-                return new ErrorReply("Lexicon Error", lexResult.Item2, s);
-            }
-        }
-
         public static Reply Parse(ref LookupTable lt, string s, bool isFromParseFunc, (string, double) var)
         {
             //This inits the lexer and processes it
@@ -316,7 +275,10 @@ namespace Interpreter
             {
                 //Parsing begins
                 Parser parser = new Parser(ref lt, isFromParseFunc);
-                lt.AddToVariables(var.Item1, var.Item2, false);
+
+                if(var.Item1 != "")
+                    lt.AddToVariables(var.Item1, var.Item2, false);
+
                 string parseResult = parser.Parse();
 
                 //If the parser correctly parses
